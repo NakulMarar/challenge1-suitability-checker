@@ -137,35 +137,38 @@ def predict(image: Image.Image, model, top_k: int = 3):
 
 def _parse_label(raw_label: str):
     """
-    Convert model labels into plant + disease.
+    Convert model labels into (plant, disease).
 
-    Examples:
-        Healthy Tomato Plant
-        Tomato with Late Blight
-        Potato with Early Blight
+    IMPORTANT: this model's real labels are underscore-separated in
+    the PlantVillage convention, e.g.:
+
+        "Tomato___Late_blight"       -> ("Tomato", "Late Blight")
+        "Potato___Early_blight"      -> ("Potato", "Early Blight")
+        "Apple___healthy"            -> ("Apple", "Healthy")
+        "Tomato___Tomato_mosaic_virus" -> ("Tomato", "Tomato Mosaic Virus")
+
+    (A previous version of this function expected labels shaped like
+    "Tomato with Late Blight", which never actually matches this
+    model's output -- every prediction was silently falling through to
+    "Unknown". If you swap in a different model later, print
+    model.config.id2label once and re-check this function against it.)
     """
 
     label = str(raw_label).strip()
 
-    lower = label.lower()
+    if "___" in label:
+        plant_raw, disease_raw = label.split("___", 1)
+    else:
+        # Fallback for an unexpected label shape -- keeps the app
+        # running instead of crashing, just won't look as clean.
+        return label, "Unknown"
 
-    if lower.startswith("healthy"):
-        plant = label
+    plant = plant_raw.replace("_", " ").replace("(", "").replace(")", "").strip()
 
-        if label.startswith("Healthy "):
-            plant = label[len("Healthy "):]
+    disease_clean = disease_raw.replace("_", " ").strip()
+    if disease_clean.lower() == "healthy":
+        disease = "Healthy"
+    else:
+        disease = disease_clean.title()
 
-        if plant.endswith(" Plant"):
-            plant = plant[:-len(" Plant")]
-
-        return plant.strip(), "Healthy"
-
-    if " with " in label:
-        plant, disease = label.split(" with ", 1)
-
-        return (
-            plant.strip(),
-            disease.strip(),
-        )
-
-    return label, "Unknown"
+    return plant, disease
