@@ -28,16 +28,20 @@ st.set_page_config(
 
 
 # ============================================================
-# PROFESSIONAL CSS
+# DARK THEME
 # ============================================================
 
 st.markdown(
-    textwrap.dedent("""
+    """
     <style>
 
-    /* PAGE */
+    /* =========================
+       MAIN BACKGROUND
+       ========================= */
+
     .stApp {
-        background-color: #f4f8f5;
+        background-color: #080b09 !important;
+        color: #f2f5f3 !important;
     }
 
     .main .block-container {
@@ -46,192 +50,261 @@ st.markdown(
         padding-bottom: 3rem;
     }
 
-    /* SIDEBAR */
+    /* =========================
+       GENERAL TEXT
+       ========================= */
+
+    h1, h2, h3 {
+        color: #f2f5f3 !important;
+    }
+
+    p {
+        color: #c7d1cb;
+    }
+
+    /* =========================
+       SIDEBAR
+       ========================= */
+
     [data-testid="stSidebar"] {
-        background-color: #eef5f0;
-        border-right: 1px solid #dce8df;
+        background-color: #0d120f !important;
+        border-right: 1px solid #202a23;
     }
 
     [data-testid="stSidebar"] * {
-        color: #18352a;
+        color: #e8eee9 !important;
     }
 
-    /* HERO */
+    /* =========================
+       HERO
+       ========================= */
+
     .hero {
-        background: linear-gradient(135deg, #0b4d2c, #16824a);
+        background: linear-gradient(
+            135deg,
+            #06150c,
+            #0b4d2c
+        );
+
         padding: 32px 36px;
         border-radius: 22px;
-        color: white;
         margin-bottom: 25px;
-        box-shadow: 0 10px 30px rgba(0, 70, 35, 0.16);
+
+        border: 1px solid #1d5a38;
+
+        box-shadow:
+            0 10px 35px rgba(0, 0, 0, 0.45);
     }
 
     .hero h1 {
-        color: white;
+        color: white !important;
         font-size: 42px;
         font-weight: 800;
         margin: 8px 0 5px 0;
     }
 
     .hero p {
-        color: #e8fff1;
+        color: #cdebd8 !important;
         font-size: 17px;
         margin: 0;
     }
 
     .badge {
         display: inline-block;
-        background: rgba(255,255,255,0.16);
-        border: 1px solid rgba(255,255,255,0.22);
+        background: rgba(32, 180, 93, 0.16);
+        border: 1px solid rgba(32, 180, 93, 0.3);
         padding: 6px 12px;
         border-radius: 999px;
         font-size: 12px;
         font-weight: 700;
+        color: #7ff0a7 !important;
         letter-spacing: 0.4px;
     }
 
-    /* HEADINGS */
-    h1, h2, h3 {
-        color: #163b29;
-    }
+    /* =========================
+       CARDS
+       ========================= */
 
-    /* CARDS */
     .card {
-        background-color: white;
-        border: 1px solid #dce7df;
+        background-color: #101612;
+        border: 1px solid #202c24;
         border-radius: 17px;
         padding: 20px;
-        box-shadow: 0 5px 18px rgba(20, 60, 40, 0.05);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
         margin-bottom: 15px;
     }
 
     .card-title {
         font-size: 18px;
         font-weight: 750;
-        color: #173b29;
+        color: #f2f5f3 !important;
     }
 
     .card-subtitle {
-        color: #6b7d73;
+        color: #91a49a !important;
         font-size: 14px;
         margin-top: 4px;
     }
 
-    /* SCORE */
+    /* =========================
+       SCORE
+       ========================= */
+
     .score-card {
-        background-color: white;
-        border: 1px solid #dce7df;
+        background-color: #101612;
+        border: 1px solid #202c24;
         border-radius: 20px;
         padding: 25px;
         text-align: center;
-        box-shadow: 0 5px 18px rgba(20, 60, 40, 0.05);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
     }
 
     .score-title {
-        color: #708077;
+        color: #91a49a !important;
         font-size: 13px;
         font-weight: 700;
         letter-spacing: 1px;
     }
 
     .score-number {
-        color: #08783e;
+        color: #38d878 !important;
         font-size: 52px;
         font-weight: 850;
         margin: 8px 0;
     }
 
     .score-verdict {
-        color: #173b29;
+        color: #f2f5f3 !important;
         font-size: 18px;
         font-weight: 750;
     }
 
-    /* FACTOR CARDS */
+    /* =========================
+       FACTOR CARDS
+       ========================= */
+
     .factor-card {
-        background-color: white;
-        border: 1px solid #dce7df;
+        background-color: #101612;
+        border: 1px solid #202c24;
         border-radius: 17px;
         padding: 19px;
         min-height: 135px;
-        box-shadow: 0 4px 14px rgba(20, 60, 40, 0.04);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
     }
 
     .factor-title {
         font-weight: 750;
-        color: #244637;
+        color: #dce8df !important;
     }
 
     .factor-value {
         font-size: 25px;
         font-weight: 800;
-        color: #173b29;
+        color: #ffffff !important;
         margin-top: 8px;
     }
 
     .factor-range {
-        color: #718078;
+        color: #82958b !important;
         font-size: 12px;
         margin-top: 5px;
     }
 
-    /* CROP CARDS */
+    /* =========================
+       CROP CARDS
+       ========================= */
+
     .crop-card {
-        background-color: white;
-        border: 1px solid #dce7df;
+        background-color: #101612;
+        border: 1px solid #202c24;
         border-radius: 15px;
         padding: 15px 18px;
         margin-bottom: 10px;
     }
 
     .crop-name {
-        color: #173b29;
+        color: #f2f5f3 !important;
         font-size: 17px;
         font-weight: 800;
     }
 
     .crop-score {
-        color: #08783e;
+        color: #38d878 !important;
         font-weight: 800;
     }
 
-    /* FOOTER */
-    .footer {
-        text-align: center;
-        color: #718078;
-        font-size: 12px;
-        padding-top: 30px;
-    }
+    /* =========================
+       NAVIGATION
+       ========================= */
 
-    /* NAVIGATION */
     div[role="radiogroup"] {
-        background-color: white;
-        border: 1px solid #dce7df;
+        background-color: #101612 !important;
+        border: 1px solid #202c24 !important;
         border-radius: 16px;
         padding: 8px;
         gap: 6px;
-        box-shadow: 0 4px 15px rgba(20, 60, 40, 0.05);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
     }
 
     div[role="radiogroup"] label {
         border-radius: 10px;
-        padding: 8px 14px;
-        color: #294738 !important;
+        padding: 10px 15px;
+        color: #dce8df !important;
         font-weight: 650;
     }
 
-    div[role="radiogroup"] label:hover {
-        background-color: #edf7f0;
+    div[role="radiogroup"] label p {
+        color: #dce8df !important;
     }
 
-    /* BUTTONS */
+    div[role="radiogroup"] label:hover {
+        background-color: #18241c !important;
+    }
+
+    /* =========================
+       INPUTS
+       ========================= */
+
+    input {
+        background-color: #101612 !important;
+        color: #ffffff !important;
+    }
+
+    div[data-baseweb="select"] > div {
+        background-color: #101612 !important;
+        border-color: #29372e !important;
+    }
+
+    /* =========================
+       BUTTONS
+       ========================= */
+
     .stButton > button {
         border-radius: 10px;
         font-weight: 700;
     }
 
+    /* =========================
+       DIVIDERS
+       ========================= */
+
+    hr {
+        border-color: #202c24 !important;
+    }
+
+    /* =========================
+       FOOTER
+       ========================= */
+
+    .footer {
+        text-align: center;
+        color: #66786d !important;
+        font-size: 12px;
+        padding-top: 30px;
+    }
+
     </style>
-    """),
+    """,
     unsafe_allow_html=True,
 )
 
@@ -274,7 +347,7 @@ def cached_fetch_soil(lat, lon):
 # ============================================================
 
 st.markdown(
-    textwrap.dedent("""
+    """
     <div class="hero">
 
         <span class="badge">
@@ -289,7 +362,7 @@ st.markdown(
         </p>
 
     </div>
-    """),
+    """,
     unsafe_allow_html=True,
 )
 
@@ -308,21 +381,10 @@ with st.sidebar:
 
     st.markdown("### 🧭 Navigation")
 
-    st.caption(
-        "Use the navigation bar above to switch between:"
-    )
-
-    st.markdown(
-        textwrap.dedent("""
-        🗺️ **Analyze Land**
-
-        🌾 **Crop Finder**
-
-        🔬 **Disease AI**
-
-        ℹ️ **About**
-        """)
-    )
+    st.write("🗺️ Analyze Land")
+    st.write("🌾 Crop Finder")
+    st.write("🔬 Disease AI")
+    st.write("ℹ️ About")
 
     st.divider()
 
@@ -419,9 +481,8 @@ if page == "🗺️ Analyze Land":
     with coord_col:
 
         st.markdown(
-            textwrap.dedent("""
+            """
             <div class="card">
-
                 <div class="card-title">
                     📍 Location
                 </div>
@@ -429,9 +490,8 @@ if page == "🗺️ Analyze Land":
                 <div class="card-subtitle">
                     Click the map or enter coordinates.
                 </div>
-
             </div>
-            """),
+            """,
             unsafe_allow_html=True,
         )
 
@@ -475,7 +535,7 @@ if page == "🗺️ Analyze Land":
         thresholds = CROP_THRESHOLDS[crop]
 
         st.markdown(
-            textwrap.dedent(f"""
+            f"""
             <div class="card">
 
                 <div class="card-title">
@@ -487,7 +547,7 @@ if page == "🗺️ Analyze Land":
                 </div>
 
             </div>
-            """),
+            """,
             unsafe_allow_html=True,
         )
 
@@ -593,7 +653,7 @@ if page == "🗺️ Analyze Land":
         with left:
 
             st.markdown(
-                textwrap.dedent(f"""
+                f"""
                 <div class="score-card">
 
                     <div class="score-title">
@@ -609,14 +669,14 @@ if page == "🗺️ Analyze Land":
                     </div>
 
                 </div>
-                """),
+                """,
                 unsafe_allow_html=True,
             )
 
         with right:
 
             st.markdown(
-                textwrap.dedent("""
+                """
                 <div class="card">
 
                     <div class="card-title">
@@ -629,7 +689,7 @@ if page == "🗺️ Analyze Land":
                     </div>
 
                 </div>
-                """),
+                """,
                 unsafe_allow_html=True,
             )
 
@@ -649,13 +709,10 @@ if page == "🗺️ Analyze Land":
 
             if value is None:
                 display = "N/A"
-
             elif name == "Temperature":
                 display = f"{value:.1f} °C"
-
             elif name == "Rainfall":
                 display = f"{value:.0f} mm"
-
             else:
                 display = f"{value:.1f}"
 
@@ -671,7 +728,7 @@ if page == "🗺️ Analyze Land":
             with col:
 
                 st.markdown(
-                    textwrap.dedent(f"""
+                    f"""
                     <div class="factor-card">
 
                         <div class="factor-title">
@@ -697,7 +754,7 @@ if page == "🗺️ Analyze Land":
                         </strong>
 
                     </div>
-                    """),
+                    """,
                     unsafe_allow_html=True,
                 )
 
@@ -742,14 +799,10 @@ if page == "🗺️ Analyze Land":
         )
 
         if analysis["climate"].get("error"):
-            st.warning(
-                analysis["climate"]["error"]
-            )
+            st.warning(analysis["climate"]["error"])
 
         if analysis["soil"].get("error"):
-            st.warning(
-                analysis["soil"]["error"]
-            )
+            st.warning(analysis["soil"]["error"])
 
 
 # ============================================================
@@ -766,7 +819,7 @@ elif page == "🌾 Crop Finder":
     )
 
     st.markdown(
-        textwrap.dedent("""
+        """
         <div class="card">
 
             <div class="card-title">
@@ -780,7 +833,7 @@ elif page == "🌾 Crop Finder":
             </div>
 
         </div>
-        """),
+        """,
         unsafe_allow_html=True,
     )
 
@@ -843,14 +896,9 @@ elif page == "🌾 Crop Finder":
 
         st.subheader("🌿 Matching crops")
 
-        for i, result in enumerate(
-            results[:10],
-            1,
-        ):
+        for i, result in enumerate(results[:10], 1):
 
-            score = round(
-                result["score"] * 100
-            )
+            score = round(result["score"] * 100)
 
             if result["verdict"] == "Suitable":
                 icon = "🟢"
@@ -860,7 +908,7 @@ elif page == "🌾 Crop Finder":
                 icon = "🔴"
 
             st.markdown(
-                textwrap.dedent(f"""
+                f"""
                 <div class="crop-card">
 
                     <div class="crop-name">
@@ -876,7 +924,7 @@ elif page == "🌾 Crop Finder":
                     </div>
 
                 </div>
-                """),
+                """,
                 unsafe_allow_html=True,
             )
 
@@ -921,9 +969,7 @@ elif page == "🔬 Disease AI":
 
     if uploaded_photo:
 
-        image = Image.open(
-            uploaded_photo
-        ).convert("RGB")
+        image = Image.open(uploaded_photo).convert("RGB")
 
         col1, col2 = st.columns(
             [1, 1],
@@ -941,7 +987,7 @@ elif page == "🔬 Disease AI":
         with col2:
 
             st.markdown(
-                textwrap.dedent("""
+                """
                 <div class="card">
 
                     <div class="card-title">
@@ -954,7 +1000,7 @@ elif page == "🔬 Disease AI":
                     </div>
 
                 </div>
-                """),
+                """,
                 unsafe_allow_html=True,
             )
 
@@ -968,9 +1014,7 @@ elif page == "🔬 Disease AI":
 
             try:
 
-                with st.spinner(
-                    "Running disease AI..."
-                ):
+                with st.spinner("Running disease AI..."):
 
                     model = get_disease_model()
 
@@ -1020,7 +1064,7 @@ elif page == "🔬 Disease AI":
                     )
 
                     st.markdown(
-                        textwrap.dedent(f"""
+                        f"""
                         <div class="card">
 
                             <div class="card-title">
@@ -1032,7 +1076,7 @@ elif page == "🔬 Disease AI":
                             </div>
 
                         </div>
-                        """),
+                        """,
                         unsafe_allow_html=True,
                     )
 
@@ -1055,23 +1099,17 @@ elif page == "🔬 Disease AI":
 
                 else:
 
-                    st.error(
-                        "No prediction was returned."
-                    )
+                    st.error("No prediction was returned.")
 
             except Exception as exc:
 
-                st.error(
-                    "The disease model could not run."
-                )
+                st.error("The disease model could not run.")
 
                 st.code(str(exc))
 
     else:
 
-        st.info(
-            "Upload a clear leaf photo to begin."
-        )
+        st.info("Upload a clear leaf photo to begin.")
 
 
 # ============================================================
@@ -1083,7 +1121,7 @@ elif page == "ℹ️ About":
     st.header("ℹ️ About CropWise")
 
     st.markdown(
-        textwrap.dedent("""
+        """
         ### 🌱 What is CropWise?
 
         CropWise is an environmental screening platform that
@@ -1141,7 +1179,7 @@ elif page == "ℹ️ About":
 
         Disease AI is also a screening tool and should not be
         treated as a definitive diagnosis.
-        """)
+        """
     )
 
 
@@ -1150,12 +1188,12 @@ elif page == "ℹ️ About":
 # ============================================================
 
 st.markdown(
-    textwrap.dedent("""
+    """
     <div class="footer">
         🌱 CropWise • Team 17 • Reboot the Earth 2026
         <br>
         Environmental screening prototype
     </div>
-    """),
+    """,
     unsafe_allow_html=True,
 )
