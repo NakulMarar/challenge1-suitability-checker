@@ -43,11 +43,36 @@ def get_disease_model():
     return disease_model.load_model()
 
 
+@st.cache_data(ttl=3600, show_spinner=False)
+def cached_fetch_climate(lat, lon):
+    return fetch_climate(lat, lon)
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def cached_fetch_soil(lat, lon):
+    return fetch_soil(lat, lon)
+
+
+with st.sidebar:
+    st.header("About this tool")
+    st.write(
+        "Pick a spot on the map, choose a crop, and get an explainable "
+        "suitability read from real climate and soil data -- plus an "
+        "optional leaf-photo disease check with treatment tips."
+    )
+    st.divider()
+    st.caption("Reboot the Earth 2026 - Challenge 1 - Team 17")
+    st.caption(
+        "Data: NASA POWER, SoilGrids (ISRIC), OpenStreetMap. "
+        "Disease model: PlantVillage-trained MobileNetV2 via Hugging Face."
+    )
+
 st.title("🌱 Land & Crop Suitability Checker")
 st.caption("Team 17 - Reboot the Earth, Challenge 1")
+st.divider()
 
 # ---------- Step 1: location ----------
-st.header("1. Choose a location")
+st.header("🗺️ 1. Choose a location")
 map_col, coord_col = st.columns([2, 1])
 
 with map_col:
@@ -71,8 +96,10 @@ with coord_col:
     )
     st.caption("Click the map or type coordinates directly -- both stay in sync.")
 
+st.divider()
+
 # ---------- Step 2: crop + optional photo ----------
-st.header("2. Pick a crop")
+st.header("🌾 2. Pick a crop")
 crop = st.selectbox("Crop", options=list(CROP_THRESHOLDS.keys()))
 uploaded_photo = st.file_uploader(
     "Leaf photo (optional) -- upload one to also run a disease check",
@@ -81,26 +108,31 @@ uploaded_photo = st.file_uploader(
 if uploaded_photo is not None:
     st.image(uploaded_photo, caption="Uploaded photo", width=220)
 
+st.divider()
+
 # ---------- Step 3-6: run everything ----------
-st.header("3. Check suitability")
+st.header("✅ 3. Check suitability")
 run = st.button("Check this location", type="primary")
 
 if run:
     lat, lon = st.session_state.lat, st.session_state.lon
 
     with st.spinner("Fetching climate and soil data for this point..."):
-        climate = fetch_climate(lat, lon)
-        soil = fetch_soil(lat, lon)
+        climate = cached_fetch_climate(lat, lon)
+        soil = cached_fetch_soil(lat, lon)
 
     thresholds = CROP_THRESHOLDS[crop]
     verdict, score, reasons = evaluate(climate, soil, thresholds)
 
-    verdict_color = {"Suitable": "green", "Marginal": "orange",
-                      "Not suitable": "red", "Unknown": "gray"}[verdict]
-    st.subheader(f"Verdict: :{verdict_color}[{verdict}]  (score {score:.2f}/1.00)")
-    for r in reasons:
-        st.write("-", r)
-    st.caption(thresholds["notes"])
+    status_box = {"Suitable": st.success, "Marginal": st.warning,
+                  "Not suitable": st.error, "Unknown": st.info}[verdict]
+    status_box(f"**{verdict}** for {crop} -- score {score:.2f} / 1.00")
+
+    with st.container(border=True):
+        st.markdown("**Why:**")
+        for r in reasons:
+            st.write("-", r)
+        st.caption(thresholds["notes"])
 
     if climate.get("error"):
         st.warning(climate["error"])
@@ -108,16 +140,17 @@ if run:
         st.warning(soil["error"])
 
     # ---------- Step 4: show the data behind the verdict ----------
-    st.subheader("Water / humidity / soil data used")
-    d1, d2, d3 = st.columns(3)
-    d1.metric("Avg. temperature", f"{climate['temp_c']:.1f} C" if climate["temp_c"] is not None else "n/a")
-    d2.metric("Est. annual rainfall", f"{climate['rain_mm_year']:.0f} mm" if climate["rain_mm_year"] is not None else "n/a")
-    d3.metric("Avg. humidity", f"{climate['humidity_pct']:.0f}%" if climate["humidity_pct"] is not None else "n/a")
-    st.metric("Soil pH", f"{soil['ph']:.1f}" if soil["ph"] is not None else "n/a")
+    st.subheader("💧 Water / humidity / soil data used")
+    with st.container(border=True):
+        d1, d2, d3 = st.columns(3)
+        d1.metric("Avg. temperature", f"{climate['temp_c']:.1f} C" if climate["temp_c"] is not None else "n/a")
+        d2.metric("Est. annual rainfall", f"{climate['rain_mm_year']:.0f} mm" if climate["rain_mm_year"] is not None else "n/a")
+        d3.metric("Avg. humidity", f"{climate['humidity_pct']:.0f}%" if climate["humidity_pct"] is not None else "n/a")
+        st.metric("Soil pH", f"{soil['ph']:.1f}" if soil["ph"] is not None else "n/a")
 
     # ---------- Step 5-6: disease check + treatment ----------
     if uploaded_photo is not None:
-        st.subheader("Disease check")
+        st.subheader("🔬 Disease check & recommendation")
         try:
             processor, model = get_disease_model()
             image = Image.open(uploaded_photo)
@@ -125,23 +158,23 @@ if run:
                 predictions = disease_model.predict(image, processor, model, top_k=3)
 
             top = predictions[0]
-            st.write(
-                f"**Top match:** {top['plant']} - {top['disease']} "
-                f"({top['confidence']*100:.1f}% confidence)"
-            )
-            with st.expander("Other possibilities"):
-                for p in predictions[1:]:
-                    st.write(f"- {p['plant']} - {p['disease']} ({p['confidence']*100:.1f}%)")
+            with st.container(border=True):
+                st.write(
+                    f"**Top match:** {top['plant']} - {top['disease']} "
+                    f"({top['confidence']*100:.1f}% confidence)"
+                )
+                with st.expander("Other possibilities"):
+                    for p in predictions[1:]:
+                        st.write(f"- {p['plant']} - {p['disease']} ({p['confidence']*100:.1f}%)")
 
-            st.subheader("Recommendation")
-            treatment = DISEASE_TREATMENTS.get(top["disease"], DEFAULT_TREATMENT)
-            st.info(treatment)
-            st.caption(
-                "Model: linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification "
-                "(MobileNetV2 fine-tuned on PlantVillage). Trained on clean lab-condition "
-                "photos, so accuracy on real field photos will be lower -- flag this "
-                "honestly if asked."
-            )
+                treatment = DISEASE_TREATMENTS.get(top["disease"], DEFAULT_TREATMENT)
+                st.info(f"**Recommendation:** {treatment}")
+                st.caption(
+                    "Model: linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification "
+                    "(MobileNetV2 fine-tuned on PlantVillage). Trained on clean lab-condition "
+                    "photos, so accuracy on real field photos will be lower -- flag this "
+                    "honestly if asked."
+                )
         except Exception as exc:  # noqa: BLE001 -- keep the core demo alive either way
             st.error(f"Disease model unavailable right now ({exc}). "
                       "The suitability check above still works independently.")
