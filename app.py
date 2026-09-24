@@ -28,283 +28,296 @@ st.set_page_config(
 
 
 # ============================================================
-# DARK THEME
+# CUSTOM CSS
 # ============================================================
 
 st.markdown(
-    """
-    <style>
+    textwrap.dedent(
+        """
+        <style>
 
-    /* =========================
-       MAIN BACKGROUND
-       ========================= */
+        /* =========================
+           GLOBAL
+           ========================= */
 
-    .stApp {
-        background-color: #080b09 !important;
-        color: #f2f5f3 !important;
-    }
+        .stApp {
+            background: #080b09 !important;
+            color: #f2f5f3 !important;
+        }
 
-    .main .block-container {
-        max-width: 1400px;
-        padding-top: 1.5rem;
-        padding-bottom: 3rem;
-    }
+        .main .block-container {
+            max-width: 1400px !important;
+            padding-top: 1.5rem !important;
+            padding-bottom: 3rem !important;
+        }
 
-    /* =========================
-       GENERAL TEXT
-       ========================= */
+        h1, h2, h3, h4 {
+            color: #f2f5f3 !important;
+        }
 
-    h1, h2, h3 {
-        color: #f2f5f3 !important;
-    }
+        p {
+            color: #c7d1cb;
+        }
 
-    p {
-        color: #c7d1cb;
-    }
+        hr {
+            border-color: #202c24 !important;
+        }
 
-    /* =========================
-       SIDEBAR
-       ========================= */
 
-    [data-testid="stSidebar"] {
-        background-color: #0d120f !important;
-        border-right: 1px solid #202a23;
-    }
+        /* =========================
+           SIDEBAR
+           ========================= */
 
-    [data-testid="stSidebar"] * {
-        color: #e8eee9 !important;
-    }
+        [data-testid="stSidebar"] {
+            background: #0d120f !important;
+            border-right: 1px solid #202a23 !important;
+        }
 
-    /* =========================
-       HERO
-       ========================= */
+        [data-testid="stSidebar"] * {
+            color: #e8eee9 !important;
+        }
 
-    .hero {
-        background: linear-gradient(
-            135deg,
-            #06150c,
-            #0b4d2c
-        );
 
-        padding: 32px 36px;
-        border-radius: 22px;
-        margin-bottom: 25px;
+        /* =========================
+           HERO
+           ========================= */
 
-        border: 1px solid #1d5a38;
+        .hero {
+            background: linear-gradient(
+                135deg,
+                #06150c 0%,
+                #0b4d2c 100%
+            );
 
-        box-shadow:
-            0 10px 35px rgba(0, 0, 0, 0.45);
-    }
+            padding: 32px 36px;
+            border-radius: 22px;
+            margin-bottom: 25px;
 
-    .hero h1 {
-        color: white !important;
-        font-size: 42px;
-        font-weight: 800;
-        margin: 8px 0 5px 0;
-    }
+            border: 1px solid #1d5a38;
 
-    .hero p {
-        color: #cdebd8 !important;
-        font-size: 17px;
-        margin: 0;
-    }
+            box-shadow:
+                0 10px 35px rgba(0, 0, 0, 0.45);
+        }
 
-    .badge {
-        display: inline-block;
-        background: rgba(32, 180, 93, 0.16);
-        border: 1px solid rgba(32, 180, 93, 0.3);
-        padding: 6px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 700;
-        color: #7ff0a7 !important;
-        letter-spacing: 0.4px;
-    }
+        .hero h1 {
+            color: #ffffff !important;
+            font-size: 42px;
+            font-weight: 800;
+            margin: 8px 0 5px 0;
+        }
 
-    /* =========================
-       CARDS
-       ========================= */
+        .hero p {
+            color: #cdebd8 !important;
+            font-size: 17px;
+            margin: 0;
+        }
 
-    .card {
-        background-color: #101612;
-        border: 1px solid #202c24;
-        border-radius: 17px;
-        padding: 20px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
-        margin-bottom: 15px;
-    }
+        .badge {
+            display: inline-block;
+            background: rgba(32, 180, 93, 0.16);
+            border: 1px solid rgba(32, 180, 93, 0.3);
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #7ff0a7 !important;
+            letter-spacing: 0.4px;
+        }
 
-    .card-title {
-        font-size: 18px;
-        font-weight: 750;
-        color: #f2f5f3 !important;
-    }
 
-    .card-subtitle {
-        color: #91a49a !important;
-        font-size: 14px;
-        margin-top: 4px;
-    }
+        /* =========================
+           CARDS
+           ========================= */
 
-    /* =========================
-       SCORE
-       ========================= */
+        .card {
+            background: #101612 !important;
+            border: 1px solid #202c24 !important;
+            border-radius: 17px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+            margin-bottom: 15px;
+        }
 
-    .score-card {
-        background-color: #101612;
-        border: 1px solid #202c24;
-        border-radius: 20px;
-        padding: 25px;
-        text-align: center;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
-    }
+        .card-title {
+            font-size: 18px;
+            font-weight: 750;
+            color: #f2f5f3 !important;
+        }
 
-    .score-title {
-        color: #91a49a !important;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 1px;
-    }
+        .card-subtitle {
+            color: #91a49a !important;
+            font-size: 14px;
+            margin-top: 4px;
+        }
 
-    .score-number {
-        color: #38d878 !important;
-        font-size: 52px;
-        font-weight: 850;
-        margin: 8px 0;
-    }
 
-    .score-verdict {
-        color: #f2f5f3 !important;
-        font-size: 18px;
-        font-weight: 750;
-    }
+        /* =========================
+           SCORE CARD
+           ========================= */
 
-    /* =========================
-       FACTOR CARDS
-       ========================= */
+        .score-card {
+            background: #101612 !important;
+            border: 1px solid #202c24 !important;
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+        }
 
-    .factor-card {
-        background-color: #101612;
-        border: 1px solid #202c24;
-        border-radius: 17px;
-        padding: 19px;
-        min-height: 135px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
-    }
+        .score-title {
+            color: #91a49a !important;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
 
-    .factor-title {
-        font-weight: 750;
-        color: #dce8df !important;
-    }
+        .score-number {
+            color: #38d878 !important;
+            font-size: 52px;
+            font-weight: 850;
+            margin: 8px 0;
+        }
 
-    .factor-value {
-        font-size: 25px;
-        font-weight: 800;
-        color: #ffffff !important;
-        margin-top: 8px;
-    }
+        .score-verdict {
+            color: #f2f5f3 !important;
+            font-size: 18px;
+            font-weight: 750;
+        }
 
-    .factor-range {
-        color: #82958b !important;
-        font-size: 12px;
-        margin-top: 5px;
-    }
 
-    /* =========================
-       CROP CARDS
-       ========================= */
+        /* =========================
+           FACTOR CARDS
+           ========================= */
 
-    .crop-card {
-        background-color: #101612;
-        border: 1px solid #202c24;
-        border-radius: 15px;
-        padding: 15px 18px;
-        margin-bottom: 10px;
-    }
+        .factor-card {
+            background: #101612 !important;
+            border: 1px solid #202c24 !important;
+            border-radius: 17px;
+            padding: 19px;
+            min-height: 135px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+        }
 
-    .crop-name {
-        color: #f2f5f3 !important;
-        font-size: 17px;
-        font-weight: 800;
-    }
+        .factor-title {
+            font-weight: 750;
+            color: #dce8df !important;
+        }
 
-    .crop-score {
-        color: #38d878 !important;
-        font-weight: 800;
-    }
+        .factor-value {
+            font-size: 25px;
+            font-weight: 800;
+            color: #ffffff !important;
+            margin-top: 8px;
+        }
 
-    /* =========================
-       NAVIGATION
-       ========================= */
+        .factor-range {
+            color: #82958b !important;
+            font-size: 12px;
+            margin-top: 5px;
+        }
 
-    div[role="radiogroup"] {
-        background-color: #101612 !important;
-        border: 1px solid #202c24 !important;
-        border-radius: 16px;
-        padding: 8px;
-        gap: 6px;
-        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
-    }
 
-    div[role="radiogroup"] label {
-        border-radius: 10px;
-        padding: 10px 15px;
-        color: #dce8df !important;
-        font-weight: 650;
-    }
+        /* =========================
+           CROP CARDS
+           ========================= */
 
-    div[role="radiogroup"] label p {
-        color: #dce8df !important;
-    }
+        .crop-card {
+            background: #101612 !important;
+            border: 1px solid #202c24 !important;
+            border-radius: 15px;
+            padding: 15px 18px;
+            margin-bottom: 10px;
+        }
 
-    div[role="radiogroup"] label:hover {
-        background-color: #18241c !important;
-    }
+        .crop-name {
+            color: #f2f5f3 !important;
+            font-size: 17px;
+            font-weight: 800;
+        }
 
-    /* =========================
-       INPUTS
-       ========================= */
+        .crop-score {
+            color: #38d878 !important;
+            font-weight: 800;
+        }
 
-    input {
-        background-color: #101612 !important;
-        color: #ffffff !important;
-    }
 
-    div[data-baseweb="select"] > div {
-        background-color: #101612 !important;
-        border-color: #29372e !important;
-    }
+        /* =========================
+           NAVIGATION
+           ========================= */
 
-    /* =========================
-       BUTTONS
-       ========================= */
+        div[role="radiogroup"] {
+            background: #101612 !important;
+            border: 1px solid #202c24 !important;
+            border-radius: 16px;
+            padding: 8px;
+            gap: 6px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+        }
 
-    .stButton > button {
-        border-radius: 10px;
-        font-weight: 700;
-    }
+        div[role="radiogroup"] label {
+            border-radius: 10px;
+            padding: 10px 15px;
+            color: #dce8df !important;
+            font-weight: 650;
+        }
 
-    /* =========================
-       DIVIDERS
-       ========================= */
+        div[role="radiogroup"] label p {
+            color: #dce8df !important;
+        }
 
-    hr {
-        border-color: #202c24 !important;
-    }
+        div[role="radiogroup"] label:hover {
+            background: #18241c !important;
+        }
 
-    /* =========================
-       FOOTER
-       ========================= */
 
-    .footer {
-        text-align: center;
-        color: #66786d !important;
-        font-size: 12px;
-        padding-top: 30px;
-    }
+        /* =========================
+           INPUTS
+           ========================= */
 
-    </style>
-    """,
+        input {
+            background: #101612 !important;
+            color: #ffffff !important;
+        }
+
+        div[data-baseweb="select"] > div {
+            background: #101612 !important;
+            border-color: #29372e !important;
+        }
+
+
+        /* =========================
+           BUTTONS
+           ========================= */
+
+        .stButton > button {
+            border-radius: 10px !important;
+            font-weight: 700 !important;
+        }
+
+
+        /* =========================
+           MAP
+           ========================= */
+
+        iframe {
+            border-radius: 16px !important;
+        }
+
+
+        /* =========================
+           FOOTER
+           ========================= */
+
+        .footer {
+            text-align: center;
+            color: #66786d !important;
+            font-size: 12px;
+            padding-top: 30px;
+        }
+
+        </style>
+        """
+    ),
     unsafe_allow_html=True,
 )
 
@@ -347,22 +360,24 @@ def cached_fetch_soil(lat, lon):
 # ============================================================
 
 st.markdown(
-    """
-    <div class="hero">
+    textwrap.dedent(
+        """
+        <div class="hero">
 
-        <span class="badge">
-            REBOOT THE EARTH 2026 • CHALLENGE 1 • TEAM 17
-        </span>
+            <span class="badge">
+                REBOOT THE EARTH 2026 • CHALLENGE 1 • TEAM 17
+            </span>
 
-        <h1>🌱 CropWise</h1>
+            <h1>🌱 CropWise</h1>
 
-        <p>
-            Smart environmental screening for better crop decisions.
-            Analyze land, discover suitable crops and screen plant diseases.
-        </p>
+            <p>
+                Smart environmental screening for better crop decisions.
+                Analyze land, discover suitable crops and screen plant diseases.
+            </p>
 
-    </div>
-    """,
+        </div>
+        """
+    ),
     unsafe_allow_html=True,
 )
 
@@ -439,6 +454,10 @@ if page == "🗺️ Analyze Land":
         gap="large",
     )
 
+    # --------------------------------------------------------
+    # MAP
+    # --------------------------------------------------------
+
     with map_col:
 
         m = folium.Map(
@@ -478,20 +497,26 @@ if page == "🗺️ Analyze Land":
                 5,
             )
 
+    # --------------------------------------------------------
+    # LOCATION
+    # --------------------------------------------------------
+
     with coord_col:
 
         st.markdown(
-            """
-            <div class="card">
-                <div class="card-title">
-                    📍 Location
-                </div>
+            textwrap.dedent(
+                """
+                <div class="card">
+                    <div class="card-title">
+                        📍 Location
+                    </div>
 
-                <div class="card-subtitle">
-                    Click the map or enter coordinates.
+                    <div class="card-subtitle">
+                        Click the map or enter coordinates.
+                    </div>
                 </div>
-            </div>
-            """,
+                """
+            ),
             unsafe_allow_html=True,
         )
 
@@ -518,6 +543,10 @@ if page == "🗺️ Analyze Land":
 
     st.divider()
 
+    # --------------------------------------------------------
+    # CROP
+    # --------------------------------------------------------
+
     st.header("🌾 Select a crop")
 
     crop_options = [
@@ -535,19 +564,21 @@ if page == "🗺️ Analyze Land":
         thresholds = CROP_THRESHOLDS[crop]
 
         st.markdown(
-            f"""
-            <div class="card">
+            textwrap.dedent(
+                f"""
+                <div class="card">
 
-                <div class="card-title">
-                    🌱 {crop}
+                    <div class="card-title">
+                        🌱 {crop}
+                    </div>
+
+                    <div class="card-subtitle">
+                        Preferred environmental conditions
+                    </div>
+
                 </div>
-
-                <div class="card-subtitle">
-                    Preferred environmental conditions
-                </div>
-
-            </div>
-            """,
+                """
+            ),
             unsafe_allow_html=True,
         )
 
@@ -568,15 +599,17 @@ if page == "🗺️ Analyze Land":
             f"{thresholds['ph'][0]}–{thresholds['ph'][1]}",
         )
 
-        st.caption(
-            thresholds.get("notes", "")
-        )
+        st.caption(thresholds.get("notes", ""))
 
     analyze = st.button(
         "🚀 Analyze Location",
         type="primary",
         use_container_width=True,
     )
+
+    # --------------------------------------------------------
+    # ANALYZE
+    # --------------------------------------------------------
 
     if analyze:
 
@@ -628,6 +661,10 @@ if page == "🗺️ Analyze Land":
                 "factors": factors,
             }
 
+    # --------------------------------------------------------
+    # RESULTS
+    # --------------------------------------------------------
+
     analysis = st.session_state.get("analysis")
 
     if analysis:
@@ -653,43 +690,47 @@ if page == "🗺️ Analyze Land":
         with left:
 
             st.markdown(
-                f"""
-                <div class="score-card">
+                textwrap.dedent(
+                    f"""
+                    <div class="score-card">
 
-                    <div class="score-title">
-                        SUITABILITY SCORE
+                        <div class="score-title">
+                            SUITABILITY SCORE
+                        </div>
+
+                        <div class="score-number">
+                            {round(analysis['score'] * 100)}%
+                        </div>
+
+                        <div class="score-verdict">
+                            {analysis['verdict']}
+                        </div>
+
                     </div>
-
-                    <div class="score-number">
-                        {round(analysis['score'] * 100)}%
-                    </div>
-
-                    <div class="score-verdict">
-                        {analysis['verdict']}
-                    </div>
-
-                </div>
-                """,
+                    """
+                ),
                 unsafe_allow_html=True,
             )
 
         with right:
 
             st.markdown(
-                """
-                <div class="card">
+                textwrap.dedent(
+                    """
+                    <div class="card">
 
-                    <div class="card-title">
-                        💡 Why?
+                        <div class="card-title">
+                            💡 Why?
+                        </div>
+
+                        <div class="card-subtitle">
+                            The score is calculated from the
+                            available environmental factors.
+                        </div>
+
                     </div>
-
-                    <div class="card-subtitle">
-                        The score is calculated from the
-                        available environmental factors.
-                    </div>
-
-                </div>
-                """,
+                    """
+                ),
                 unsafe_allow_html=True,
             )
 
@@ -728,33 +769,35 @@ if page == "🗺️ Analyze Land":
             with col:
 
                 st.markdown(
-                    f"""
-                    <div class="factor-card">
+                    textwrap.dedent(
+                        f"""
+                        <div class="factor-card">
 
-                        <div class="factor-title">
-                            {name}
+                            <div class="factor-title">
+                                {name}
+                            </div>
+
+                            <div class="factor-value">
+                                {display}
+                            </div>
+
+                            <div class="factor-range">
+                                Preferred:
+                                {factor['low']}
+                                –
+                                {factor['high']}
+                                {factor['unit']}
+                            </div>
+
+                            <br>
+
+                            <strong>
+                                {status}
+                            </strong>
+
                         </div>
-
-                        <div class="factor-value">
-                            {display}
-                        </div>
-
-                        <div class="factor-range">
-                            Preferred:
-                            {factor['low']}
-                            –
-                            {factor['high']}
-                            {factor['unit']}
-                        </div>
-
-                        <br>
-
-                        <strong>
-                            {status}
-                        </strong>
-
-                    </div>
-                    """,
+                        """
+                    ),
                     unsafe_allow_html=True,
                 )
 
@@ -819,21 +862,23 @@ elif page == "🌾 Crop Finder":
     )
 
     st.markdown(
-        """
-        <div class="card">
+        textwrap.dedent(
+            """
+            <div class="card">
 
-            <div class="card-title">
-                🔎 How Crop Finder works
+                <div class="card-title">
+                    🔎 How Crop Finder works
+                </div>
+
+                <div class="card-subtitle">
+                    The current location is compared with every crop
+                    in the database using the same transparent rules
+                    as the main analyzer.
+                </div>
+
             </div>
-
-            <div class="card-subtitle">
-                The current location is compared with every crop
-                in the database using the same transparent rules
-                as the main analyzer.
-            </div>
-
-        </div>
-        """,
+            """
+        ),
         unsafe_allow_html=True,
     )
 
@@ -908,23 +953,25 @@ elif page == "🌾 Crop Finder":
                 icon = "🔴"
 
             st.markdown(
-                f"""
-                <div class="crop-card">
+                textwrap.dedent(
+                    f"""
+                    <div class="crop-card">
 
-                    <div class="crop-name">
-                        {icon} {i}. {result['crop']}
+                        <div class="crop-name">
+                            {icon} {i}. {result['crop']}
+                        </div>
+
+                        <div>
+                            {result['verdict']}
+                            &nbsp; • &nbsp;
+                            <span class="crop-score">
+                                {score}%
+                            </span>
+                        </div>
+
                     </div>
-
-                    <div>
-                        {result['verdict']}
-                        &nbsp; • &nbsp;
-                        <span class="crop-score">
-                            {score}%
-                        </span>
-                    </div>
-
-                </div>
-                """,
+                    """
+                ),
                 unsafe_allow_html=True,
             )
 
@@ -987,20 +1034,22 @@ elif page == "🔬 Disease AI":
         with col2:
 
             st.markdown(
-                """
-                <div class="card">
+                textwrap.dedent(
+                    """
+                    <div class="card">
 
-                    <div class="card-title">
-                        🧠 MobileNetV2 Disease Screening
+                        <div class="card-title">
+                            🧠 MobileNetV2 Disease Screening
+                        </div>
+
+                        <div class="card-subtitle">
+                            The model analyzes the image and returns
+                            its most likely plant-disease labels.
+                        </div>
+
                     </div>
-
-                    <div class="card-subtitle">
-                        The model analyzes the image and returns
-                        its most likely plant-disease labels.
-                    </div>
-
-                </div>
-                """,
+                    """
+                ),
                 unsafe_allow_html=True,
             )
 
@@ -1064,19 +1113,21 @@ elif page == "🔬 Disease AI":
                     )
 
                     st.markdown(
-                        f"""
-                        <div class="card">
+                        textwrap.dedent(
+                            f"""
+                            <div class="card">
 
-                            <div class="card-title">
-                                💡 Guidance
+                                <div class="card-title">
+                                    💡 Guidance
+                                </div>
+
+                                <div>
+                                    {treatment}
+                                </div>
+
                             </div>
-
-                            <div>
-                                {treatment}
-                            </div>
-
-                        </div>
-                        """,
+                            """
+                        ),
                         unsafe_allow_html=True,
                     )
 
@@ -1104,7 +1155,6 @@ elif page == "🔬 Disease AI":
             except Exception as exc:
 
                 st.error("The disease model could not run.")
-
                 st.code(str(exc))
 
     else:
@@ -1188,12 +1238,14 @@ elif page == "ℹ️ About":
 # ============================================================
 
 st.markdown(
-    """
-    <div class="footer">
-        🌱 CropWise • Team 17 • Reboot the Earth 2026
-        <br>
-        Environmental screening prototype
-    </div>
-    """,
+    textwrap.dedent(
+        """
+        <div class="footer">
+            🌱 CropWise • Team 17 • Reboot the Earth 2026
+            <br>
+            Environmental screening prototype
+        </div>
+        """
+    ),
     unsafe_allow_html=True,
 )
