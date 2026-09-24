@@ -1,4 +1,5 @@
 import streamlit as st
+import textwrap
 import folium
 from streamlit_folium import st_folium
 from PIL import Image
@@ -31,7 +32,7 @@ st.set_page_config(
 # ============================================================
 
 st.markdown(
-    """
+    textwrap.dedent("""
     <style>
 
     /* PAGE */
@@ -230,7 +231,7 @@ st.markdown(
     }
 
     </style>
-    """,
+    """),
     unsafe_allow_html=True,
 )
 
@@ -273,7 +274,7 @@ def cached_fetch_soil(lat, lon):
 # ============================================================
 
 st.markdown(
-    """
+    textwrap.dedent("""
     <div class="hero">
 
         <span class="badge">
@@ -288,7 +289,7 @@ st.markdown(
         </p>
 
     </div>
-    """,
+    """),
     unsafe_allow_html=True,
 )
 
@@ -312,7 +313,7 @@ with st.sidebar:
     )
 
     st.markdown(
-        """
+        textwrap.dedent("""
         🗺️ **Analyze Land**
 
         🌾 **Crop Finder**
@@ -320,7 +321,7 @@ with st.sidebar:
         🔬 **Disease AI**
 
         ℹ️ **About**
-        """
+        """)
     )
 
     st.divider()
@@ -418,7 +419,7 @@ if page == "🗺️ Analyze Land":
     with coord_col:
 
         st.markdown(
-            """
+            textwrap.dedent("""
             <div class="card">
 
                 <div class="card-title">
@@ -430,7 +431,7 @@ if page == "🗺️ Analyze Land":
                 </div>
 
             </div>
-            """,
+            """),
             unsafe_allow_html=True,
         )
 
@@ -474,7 +475,7 @@ if page == "🗺️ Analyze Land":
         thresholds = CROP_THRESHOLDS[crop]
 
         st.markdown(
-            f"""
+            textwrap.dedent(f"""
             <div class="card">
 
                 <div class="card-title">
@@ -486,7 +487,7 @@ if page == "🗺️ Analyze Land":
                 </div>
 
             </div>
-            """,
+            """),
             unsafe_allow_html=True,
         )
 
@@ -592,7 +593,7 @@ if page == "🗺️ Analyze Land":
         with left:
 
             st.markdown(
-                f"""
+                textwrap.dedent(f"""
                 <div class="score-card">
 
                     <div class="score-title">
@@ -608,14 +609,14 @@ if page == "🗺️ Analyze Land":
                     </div>
 
                 </div>
-                """,
+                """),
                 unsafe_allow_html=True,
             )
 
         with right:
 
             st.markdown(
-                """
+                textwrap.dedent("""
                 <div class="card">
 
                     <div class="card-title">
@@ -628,7 +629,7 @@ if page == "🗺️ Analyze Land":
                     </div>
 
                 </div>
-                """,
+                """),
                 unsafe_allow_html=True,
             )
 
@@ -670,7 +671,7 @@ if page == "🗺️ Analyze Land":
             with col:
 
                 st.markdown(
-                    f"""
+                    textwrap.dedent(f"""
                     <div class="factor-card">
 
                         <div class="factor-title">
@@ -696,7 +697,7 @@ if page == "🗺️ Analyze Land":
                         </strong>
 
                     </div>
-                    """,
+                    """),
                     unsafe_allow_html=True,
                 )
 
@@ -765,7 +766,7 @@ elif page == "🌾 Crop Finder":
     )
 
     st.markdown(
-        """
+        textwrap.dedent("""
         <div class="card">
 
             <div class="card-title">
@@ -779,7 +780,7 @@ elif page == "🌾 Crop Finder":
             </div>
 
         </div>
-        """,
+        """),
         unsafe_allow_html=True,
     )
 
@@ -859,7 +860,7 @@ elif page == "🌾 Crop Finder":
                 icon = "🔴"
 
             st.markdown(
-                f"""
+                textwrap.dedent(f"""
                 <div class="crop-card">
 
                     <div class="crop-name">
@@ -875,7 +876,7 @@ elif page == "🌾 Crop Finder":
                     </div>
 
                 </div>
-                """,
+                """),
                 unsafe_allow_html=True,
             )
 
@@ -940,7 +941,7 @@ elif page == "🔬 Disease AI":
         with col2:
 
             st.markdown(
-                """
+                textwrap.dedent("""
                 <div class="card">
 
                     <div class="card-title">
@@ -953,7 +954,7 @@ elif page == "🔬 Disease AI":
                     </div>
 
                 </div>
-                """,
+                """),
                 unsafe_allow_html=True,
             )
 
@@ -1019,7 +1020,7 @@ elif page == "🔬 Disease AI":
                     )
 
                     st.markdown(
-                        f"""
+                        textwrap.dedent(f"""
                         <div class="card">
 
                             <div class="card-title">
@@ -1031,7 +1032,7 @@ elif page == "🔬 Disease AI":
                             </div>
 
                         </div>
-                        """,
+                        """),
                         unsafe_allow_html=True,
                     )
 
@@ -1082,7 +1083,7 @@ elif page == "ℹ️ About":
     st.header("ℹ️ About CropWise")
 
     st.markdown(
-        """
+        textwrap.dedent("""
         ### 🌱 What is CropWise?
 
         CropWise is an environmental screening platform that
@@ -1140,7 +1141,7 @@ elif page == "ℹ️ About":
 
         Disease AI is also a screening tool and should not be
         treated as a definitive diagnosis.
-        """
+        """)
     )
 
 
@@ -1149,12 +1150,12 @@ elif page == "ℹ️ About":
 # ============================================================
 
 st.markdown(
-    """
+    textwrap.dedent("""
     <div class="footer">
         🌱 CropWise • Team 17 • Reboot the Earth 2026
         <br>
         Environmental screening prototype
     </div>
-    """,
+    """),
     unsafe_allow_html=True,
 )
