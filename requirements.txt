@@ -5,4 +5,3 @@ requests
 pillow
 transformers==4.57.1
 torch
-torchvision
