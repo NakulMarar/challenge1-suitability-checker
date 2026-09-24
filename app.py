@@ -34,10 +34,9 @@ st.markdown(
     """
     <style>
 
-    /* ---------- PAGE ---------- */
-
+    /* PAGE */
     .stApp {
-        background: #f4f8f5;
+        background-color: #f4f8f5;
     }
 
     .main .block-container {
@@ -46,11 +45,9 @@ st.markdown(
         padding-bottom: 3rem;
     }
 
-
-    /* ---------- SIDEBAR ---------- */
-
+    /* SIDEBAR */
     [data-testid="stSidebar"] {
-        background: #eef5f0;
+        background-color: #eef5f0;
         border-right: 1px solid #dce8df;
     }
 
@@ -58,23 +55,14 @@ st.markdown(
         color: #18352a;
     }
 
-
-    /* ---------- HERO ---------- */
-
+    /* HERO */
     .hero {
-        background: linear-gradient(
-            135deg,
-            #0b4d2c,
-            #16824a
-        );
-
+        background: linear-gradient(135deg, #0b4d2c, #16824a);
         padding: 32px 36px;
         border-radius: 22px;
         color: white;
         margin-bottom: 25px;
-
-        box-shadow:
-            0 10px 30px rgba(0, 70, 35, 0.16);
+        box-shadow: 0 10px 30px rgba(0, 70, 35, 0.16);
     }
 
     .hero h1 {
@@ -101,40 +89,14 @@ st.markdown(
         letter-spacing: 0.4px;
     }
 
-
-    /* ---------- HEADINGS ---------- */
-
+    /* HEADINGS */
     h1, h2, h3 {
         color: #163b29;
     }
 
-
-    /* ---------- TABS ---------- */
-
-    /* Force tab text to remain visible */
-
-    button[data-baseweb="tab"] {
-        color: #294738 !important;
-        font-weight: 700 !important;
-        font-size: 15px !important;
-        background: transparent !important;
-    }
-
-    button[data-baseweb="tab"][aria-selected="true"] {
-        color: #08783e !important;
-    }
-
-    div[data-baseweb="tab-list"] {
-        gap: 8px;
-        border-bottom: 2px solid #dbe8df;
-        margin-bottom: 25px;
-    }
-
-
-    /* ---------- CARDS ---------- */
-
+    /* CARDS */
     .card {
-        background: white;
+        background-color: white;
         border: 1px solid #dce7df;
         border-radius: 17px;
         padding: 20px;
@@ -154,11 +116,9 @@ st.markdown(
         margin-top: 4px;
     }
 
-
-    /* ---------- SCORE ---------- */
-
+    /* SCORE */
     .score-card {
-        background: white;
+        background-color: white;
         border: 1px solid #dce7df;
         border-radius: 20px;
         padding: 25px;
@@ -186,11 +146,9 @@ st.markdown(
         font-weight: 750;
     }
 
-
-    /* ---------- FACTOR CARDS ---------- */
-
+    /* FACTOR CARDS */
     .factor-card {
-        background: white;
+        background-color: white;
         border: 1px solid #dce7df;
         border-radius: 17px;
         padding: 19px;
@@ -216,11 +174,9 @@ st.markdown(
         margin-top: 5px;
     }
 
-
-    /* ---------- CROP FINDER ---------- */
-
+    /* CROP CARDS */
     .crop-card {
-        background: white;
+        background-color: white;
         border: 1px solid #dce7df;
         border-radius: 15px;
         padding: 15px 18px;
@@ -238,14 +194,39 @@ st.markdown(
         font-weight: 800;
     }
 
-
-    /* ---------- FOOTER ---------- */
-
+    /* FOOTER */
     .footer {
         text-align: center;
         color: #718078;
         font-size: 12px;
         padding-top: 30px;
+    }
+
+    /* NAVIGATION */
+    div[role="radiogroup"] {
+        background-color: white;
+        border: 1px solid #dce7df;
+        border-radius: 16px;
+        padding: 8px;
+        gap: 6px;
+        box-shadow: 0 4px 15px rgba(20, 60, 40, 0.05);
+    }
+
+    div[role="radiogroup"] label {
+        border-radius: 10px;
+        padding: 8px 14px;
+        color: #294738 !important;
+        font-weight: 650;
+    }
+
+    div[role="radiogroup"] label:hover {
+        background-color: #edf7f0;
+    }
+
+    /* BUTTONS */
+    .stButton > button {
+        border-radius: 10px;
+        font-weight: 700;
     }
 
     </style>
@@ -272,9 +253,7 @@ if "lon" not in st.session_state:
 # CACHING
 # ============================================================
 
-@st.cache_resource(
-    show_spinner="Loading disease AI..."
-)
+@st.cache_resource(show_spinner="Loading disease AI...")
 def get_disease_model():
     return disease_model.load_model()
 
@@ -322,40 +301,31 @@ with st.sidebar:
 
     st.markdown("## 🌱 CropWise")
 
-    st.caption(
-        "Land & Crop Intelligence"
-    )
+    st.caption("Land & Crop Intelligence")
 
     st.divider()
 
     st.markdown("### 🧭 Navigation")
 
+    st.caption(
+        "Use the navigation bar above to switch between:"
+    )
+
     st.markdown(
         """
-        **🗺️ Analyze Land**
+        🗺️ **Analyze Land**
 
-        Check a specific crop against
-        environmental conditions.
+        🌾 **Crop Finder**
 
-        **🌾 Crop Finder**
+        🔬 **Disease AI**
 
-        Compare the location against
-        the complete crop database.
-
-        **🔬 Disease AI**
-
-        Upload a leaf image for
-        AI-based disease screening.
-
-        **ℹ️ About**
-
-        Learn about the data and model.
+        ℹ️ **About**
         """
     )
 
     st.divider()
 
-    st.markdown("### 📡 Data")
+    st.markdown("### 📡 Data Sources")
 
     st.caption(
         "NASA POWER\n\n"
@@ -366,30 +336,33 @@ with st.sidebar:
 
     st.divider()
 
-    st.caption(
-        "Team 17 • Reboot the Earth 2026"
-    )
+    st.caption("Team 17 • Reboot the Earth 2026")
 
 
 # ============================================================
-# TABS
+# NAVIGATION
 # ============================================================
 
-tab_land, tab_finder, tab_disease, tab_about = st.tabs(
+page = st.radio(
+    "Navigation",
     [
         "🗺️ Analyze Land",
         "🌾 Crop Finder",
         "🔬 Disease AI",
         "ℹ️ About",
-    ]
+    ],
+    horizontal=True,
+    label_visibility="collapsed",
 )
+
+st.divider()
 
 
 # ============================================================
 # ANALYZE LAND
 # ============================================================
 
-with tab_land:
+if page == "🗺️ Analyze Land":
 
     st.header("🗺️ Analyze Land")
 
@@ -447,6 +420,7 @@ with tab_land:
         st.markdown(
             """
             <div class="card">
+
                 <div class="card-title">
                     📍 Location
                 </div>
@@ -454,6 +428,7 @@ with tab_land:
                 <div class="card-subtitle">
                     Click the map or enter coordinates.
                 </div>
+
             </div>
             """,
             unsafe_allow_html=True,
@@ -533,10 +508,7 @@ with tab_land:
         )
 
         st.caption(
-            thresholds.get(
-                "notes",
-                "",
-            )
+            thresholds.get("notes", "")
         )
 
     analyze = st.button(
@@ -549,9 +521,7 @@ with tab_land:
 
         if crop == "-- Select a crop --":
 
-            st.warning(
-                "Select a crop first."
-            )
+            st.warning("Select a crop first.")
 
         else:
 
@@ -597,17 +567,21 @@ with tab_land:
                 "factors": factors,
             }
 
-    analysis = st.session_state.get(
-        "analysis"
-    )
+    analysis = st.session_state.get("analysis")
 
     if analysis:
 
         st.divider()
 
+        if analysis["verdict"] == "Suitable":
+            result_icon = "🟢"
+        elif analysis["verdict"] == "Marginal":
+            result_icon = "🟡"
+        else:
+            result_icon = "🔴"
+
         st.header(
-            f"{'🟢' if analysis['verdict'] == 'Suitable' else '🟡' if analysis['verdict'] == 'Marginal' else '🔴'} "
-            f"Result for {analysis['crop']}"
+            f"{result_icon} Result for {analysis['crop']}"
         )
 
         left, right = st.columns(
@@ -673,35 +647,24 @@ with tab_land:
             value = factor["value"]
 
             if value is None:
-
                 display = "N/A"
 
             elif name == "Temperature":
-
                 display = f"{value:.1f} °C"
 
             elif name == "Rainfall":
-
                 display = f"{value:.0f} mm"
 
             else:
-
                 display = f"{value:.1f}"
 
             if factor["score"] == 1.0:
-
                 status = "🟢 Within range"
-
             elif factor["score"] == 0.5:
-
                 status = "🟡 Marginal"
-
             elif factor["score"] == 0.0:
-
                 status = "🔴 Outside range"
-
             else:
-
                 status = "⚪ Unavailable"
 
             with col:
@@ -792,7 +755,7 @@ with tab_land:
 # CROP FINDER
 # ============================================================
 
-with tab_finder:
+elif page == "🌾 Crop Finder":
 
     st.header("🌾 Crop Finder")
 
@@ -821,7 +784,7 @@ with tab_finder:
     )
 
     st.info(
-        f"Location: {st.session_state.lat:.5f}, "
+        f"📍 Location: {st.session_state.lat:.5f}, "
         f"{st.session_state.lon:.5f}"
     )
 
@@ -873,9 +836,7 @@ with tab_finder:
 
             st.session_state.crop_results = crop_results
 
-    results = st.session_state.get(
-        "crop_results"
-    )
+    results = st.session_state.get("crop_results")
 
     if results:
 
@@ -918,9 +879,7 @@ with tab_finder:
                 unsafe_allow_html=True,
             )
 
-        with st.expander(
-            "View every crop"
-        ):
+        with st.expander("View every crop"):
 
             for result in results:
 
@@ -940,7 +899,7 @@ with tab_finder:
 # DISEASE AI
 # ============================================================
 
-with tab_disease:
+elif page == "🔬 Disease AI":
 
     st.header("🔬 Plant Disease AI")
 
@@ -1026,9 +985,7 @@ with tab_disease:
 
                     st.divider()
 
-                    st.subheader(
-                        "AI prediction"
-                    )
+                    st.subheader("AI prediction")
 
                     a, b = st.columns(2)
 
@@ -1080,9 +1037,7 @@ with tab_disease:
 
                     if len(predictions) > 1:
 
-                        with st.expander(
-                            "Other predictions"
-                        ):
+                        with st.expander("Other predictions"):
 
                             for prediction in predictions[1:]:
 
@@ -1109,9 +1064,7 @@ with tab_disease:
                     "The disease model could not run."
                 )
 
-                st.code(
-                    str(exc)
-                )
+                st.code(str(exc))
 
     else:
 
@@ -1124,7 +1077,7 @@ with tab_disease:
 # ABOUT
 # ============================================================
 
-with tab_about:
+elif page == "ℹ️ About":
 
     st.header("ℹ️ About CropWise")
 
