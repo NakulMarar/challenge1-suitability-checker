@@ -551,10 +551,6 @@ if page == "🗺️ Analyze Land":
         "the environmental conditions."
     )
 
-    # --------------------------------------------------------
-    # WORKFLOW
-    # --------------------------------------------------------
-
     step_cols = st.columns(3)
 
     with step_cols[0]:
@@ -596,10 +592,6 @@ if page == "🗺️ Analyze Land":
         [2.2, 1],
         gap="large",
     )
-
-    # --------------------------------------------------------
-    # MAP
-    # --------------------------------------------------------
 
     with map_col:
 
@@ -651,10 +643,6 @@ if page == "🗺️ Analyze Land":
 
             st.rerun()
 
-    # --------------------------------------------------------
-    # LOCATION PANEL
-    # --------------------------------------------------------
-
     with location_col:
 
         render_html(
@@ -705,10 +693,6 @@ Use the map or type coordinates manually.
             st.rerun()
 
     st.divider()
-
-    # --------------------------------------------------------
-    # CROP
-    # --------------------------------------------------------
 
     st.header("🌾 Select a crop")
 
@@ -824,11 +808,6 @@ Reference environmental conditions
 
             st.success("Analysis complete.")
 
-
-    # ========================================================
-    # RESULTS
-    # ========================================================
-
     analysis = st.session_state.get("analysis")
 
     if analysis:
@@ -912,10 +891,6 @@ reference range using transparent rules.
             for reason in analysis["reasons"]:
                 st.write("•", reason)
 
-        # ----------------------------------------------------
-        # FACTORS
-        # ----------------------------------------------------
-
         st.subheader("📊 Environmental match")
 
         factor_cols = st.columns(3)
@@ -926,6 +901,7 @@ reference range using transparent rules.
         ):
 
             value = factor["value"]
+
             percentage = score_percent(
                 factor["score"]
             )
@@ -968,10 +944,6 @@ style="width:{percentage}%">
 </div>
 """
                 )
-
-        # ----------------------------------------------------
-        # RAW DATA
-        # ----------------------------------------------------
 
         st.subheader("🌍 Environmental data")
 
@@ -1134,13 +1106,21 @@ elif page == "🌾 Crop Finder":
                 "soil": soil,
             }
 
-    finder = st.session_state.get(
-        "crop_results"
-    )
+    # ========================================================
+    # FIXED CROP FINDER STATE HANDLING
+    # ========================================================
 
-    if finder:
+    finder = st.session_state.get("crop_results")
 
-        results = finder["results"]
+    if isinstance(finder, dict):
+
+        results = finder.get("results", [])
+
+    else:
+
+        results = []
+
+    if results:
 
         st.subheader("🌿 Crop matches")
 
@@ -1233,8 +1213,8 @@ style="width:{score}%">
             "🌍 Environmental data used"
         ):
 
-            climate = finder["climate"]
-            soil = finder["soil"]
+            climate = finder.get("climate", {})
+            soil = finder.get("soil", {})
 
             a, b, c, d = st.columns(4)
 
@@ -1277,6 +1257,13 @@ style="width:{score}%">
         st.caption(
             "Crop Finder uses the same transparent reference-range "
             "screening system as Analyze Land."
+        )
+
+    else:
+
+        st.info(
+            "Click **Find Matching Crops** to compare this location "
+            "with the crop database."
         )
 
 
