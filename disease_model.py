@@ -1,75 +1,171 @@
+"""
+disease_model.py
+----------------
+Plant disease classification using the PlantVillage-trained
+MobileNetV2 model on Hugging Face.
+
+Image preprocessing is performed locally with PIL + torch rather
+than relying on a model-specific Transformers image processor.
+This avoids processor-config compatibility problems with the
+model repository.
+"""
+
 from PIL import Image
-from transformers import AutoModelForImageClassification, MobileNetV2ImageProcessor
+from transformers import AutoModelForImageClassification
 import torch
+import torch.nn.functional as F
 
 MODEL_NAME = "linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification"
 
+IMAGE_SIZE = 224
+IMAGE_MEAN = torch.tensor([0.5, 0.5, 0.5]).view(3, 1, 1)
+IMAGE_STD = torch.tensor([0.5, 0.5, 0.5]).view(3, 1, 1)
+
 
 def load_model():
-    # The original model uses the legacy MobileNetV2FeatureExtractor.
-    # MobileNetV2ImageProcessor is the current equivalent.
-    processor = MobileNetV2ImageProcessor(
-        size={"shortest_edge": 256},
-        crop_size={"height": 224, "width": 224},
-        do_resize=True,
-        do_center_crop=True,
-        do_rescale=True,
-        rescale_factor=1 / 255,
-        do_normalize=True,
-        image_mean=[0.5, 0.5, 0.5],
-        image_std=[0.5, 0.5, 0.5],
-    )
+    """
+    Download/load the disease model.
 
+    Returns:
+        model
+    """
     model = AutoModelForImageClassification.from_pretrained(MODEL_NAME)
     model.eval()
 
-    return processor, model
+    return model
 
 
-def predict(image: Image.Image, processor, model, top_k: int = 3):
-    inputs = processor(
-        images=image.convert("RGB"),
-        return_tensors="pt"
+def _preprocess(image: Image.Image) -> torch.Tensor:
+    """
+    Convert a PIL image into the tensor expected by the model.
+
+    The original model uses:
+      - RGB
+      - resize
+      - center crop
+      - scale 0-255 -> 0-1
+      - mean/std normalization of 0.5
+    """
+
+    image = image.convert("RGB")
+
+    # Resize while keeping the aspect ratio.
+    image.thumbnail((256, 256), Image.Resampling.BILINEAR)
+
+    # Put the image on a 256x256 canvas.
+    canvas = Image.new("RGB", (256, 256))
+    left = (256 - image.width) // 2
+    top = (256 - image.height) // 2
+    canvas.paste(image, (left, top))
+
+    # Center crop to 224x224.
+    left = (256 - IMAGE_SIZE) // 2
+    top = (256 - IMAGE_SIZE) // 2
+
+    image = canvas.crop(
+        (
+            left,
+            top,
+            left + IMAGE_SIZE,
+            top + IMAGE_SIZE,
+        )
     )
 
-    with torch.no_grad():
-        outputs = model(**inputs)
-        probs = torch.nn.functional.softmax(outputs.logits, dim=-1)[0]
+    # PIL -> torch tensor.
+    # Shape: H,W,C -> C,H,W
+    pixels = torch.tensor(
+        list(image.getdata()),
+        dtype=torch.float32,
+    ).reshape(IMAGE_SIZE, IMAGE_SIZE, 3)
 
-    k = min(top_k, probs.shape[0])
-    top_probs, top_idxs = torch.topk(probs, k=k)
+    tensor = pixels.permute(2, 0, 1) / 255.0
+
+    # Normalize using the model's expected values.
+    tensor = (tensor - IMAGE_MEAN) / IMAGE_STD
+
+    # Add batch dimension.
+    return tensor.unsqueeze(0)
+
+
+def predict(image: Image.Image, model, top_k: int = 3):
+    """
+    Run disease prediction.
+
+    Returns:
+        list of dictionaries containing plant, disease,
+        raw label and confidence.
+    """
+
+    inputs = _preprocess(image)
+
+    with torch.no_grad():
+        outputs = model(pixel_values=inputs)
+
+        probabilities = F.softmax(
+            outputs.logits,
+            dim=-1,
+        )[0]
+
+    k = min(top_k, probabilities.shape[0])
+
+    top_probs, top_idxs = torch.topk(
+        probabilities,
+        k=k,
+    )
 
     results = []
 
-    for prob, idx in zip(top_probs.tolist(), top_idxs.tolist()):
-        raw_label = model.config.id2label[idx]
+    for probability, index in zip(
+        top_probs.tolist(),
+        top_idxs.tolist(),
+    ):
+        raw_label = model.config.id2label[index]
+
         plant, disease = _parse_label(raw_label)
 
-        results.append({
-            "plant": plant,
-            "disease": disease,
-            "raw_label": raw_label,
-            "confidence": prob,
-        })
+        results.append(
+            {
+                "plant": plant,
+                "disease": disease,
+                "raw_label": raw_label,
+                "confidence": probability,
+            }
+        )
 
     return results
 
 
 def _parse_label(raw_label: str):
-    # Handles labels such as:
-    # "Tomato with Late Blight"
-    # "Healthy Tomato Plant"
-    # "Potato with Early Blight"
+    """
+    Convert model labels into plant + disease.
 
-    label = raw_label.strip()
+    Examples:
+        Healthy Tomato Plant
+        Tomato with Late Blight
+        Potato with Early Blight
+    """
 
-    if label.lower().startswith("healthy"):
-        plant = label.replace("Healthy ", "").replace(" Plant", "").strip()
-        disease = "Healthy"
-        return plant, disease
+    label = str(raw_label).strip()
+
+    lower = label.lower()
+
+    if lower.startswith("healthy"):
+        plant = label
+
+        if label.startswith("Healthy "):
+            plant = label[len("Healthy "):]
+
+        if plant.endswith(" Plant"):
+            plant = plant[:-len(" Plant")]
+
+        return plant.strip(), "Healthy"
 
     if " with " in label:
         plant, disease = label.split(" with ", 1)
-        return plant.strip(), disease.strip()
+
+        return (
+            plant.strip(),
+            disease.strip(),
+        )
 
     return label, "Unknown"
