@@ -1,56 +1,114 @@
 """
 suitability.py
----------------
-Rule-based suitability scoring: compares fetched climate/soil data
-against a crop's threshold ranges from crop_data.CROP_THRESHOLDS.
+--------------
+Transparent rule-based crop suitability scoring.
 
-Deliberately simple (three factors, equal weight, transparent reasons)
-so it's easy to explain to judges live. Swap in a weighted score or an
-ML model later if time allows -- the interface (evaluate() returning
-verdict/score/reasons) doesn't need to change if you do.
+Each crop is evaluated against:
+    - Temperature
+    - Annual rainfall
+    - Soil pH
+
+All available factors receive equal weight.
+
+The score is a screening indicator, not a guaranteed
+agricultural yield prediction.
 """
 
 
 def _score_range(value, low, high):
-    """1.0 if inside [low, high], 0.5 if just outside (marginal), else 0.
-    None (missing data) is excluded from scoring rather than penalized."""
+    """
+    Return:
+
+        1.0 -> inside preferred range
+        0.5 -> slightly outside preferred range
+        0.0 -> significantly outside preferred range
+        None -> missing data
+    """
+
     if value is None:
         return None
+
     if low <= value <= high:
         return 1.0
+
     span = max(high - low, 1e-6)
-    distance = (low - value) / span if value < low else (value - high) / span
+
+    if value < low:
+        distance = (low - value) / span
+    else:
+        distance = (value - high) / span
+
     return 0.5 if distance <= 0.25 else 0.0
 
 
 def evaluate(climate: dict, soil: dict, thresholds: dict):
     """
-    Returns (verdict: str, score: float 0-1, reasons: list[str]).
-    verdict is one of "Suitable", "Marginal", "Not suitable", "Unknown".
-    "Unknown" only happens if every factor came back as missing data.
+    Return:
+
+        verdict
+        score
+        reasons
+
+    verdict:
+        Suitable
+        Marginal
+        Not suitable
+        Unknown
     """
+
     factor_scores = {
-        "Temperature": _score_range(climate.get("temp_c"), *thresholds["temp_c"]),
-        "Rainfall": _score_range(climate.get("rain_mm_year"), *thresholds["rain_mm"]),
-        "Soil pH": _score_range(soil.get("ph"), *thresholds["ph"]),
+        "Temperature": _score_range(
+            climate.get("temp_c"),
+            *thresholds["temp_c"],
+        ),
+        "Rainfall": _score_range(
+            climate.get("rain_mm_year"),
+            *thresholds["rain_mm"],
+        ),
+        "Soil pH": _score_range(
+            soil.get("ph"),
+            *thresholds["ph"],
+        ),
     }
 
-    known = {k: v for k, v in factor_scores.items() if v is not None}
+    known = {
+        factor: score
+        for factor, score in factor_scores.items()
+        if score is not None
+    }
+
     if not known:
-        return "Unknown", 0.0, ["No climate or soil data could be fetched for this point."]
+        return (
+            "Unknown",
+            0.0,
+            ["No climate or soil data could be fetched for this point."],
+        )
 
     score = sum(known.values()) / len(known)
 
     reasons = []
-    for factor, val in factor_scores.items():
-        if val is None:
-            reasons.append(f"{factor}: data unavailable, excluded from score.")
-        elif val == 1.0:
-            reasons.append(f"{factor}: within range.")
-        elif val == 0.5:
-            reasons.append(f"{factor}: just outside the ideal range (marginal).")
+
+    for factor, value in factor_scores.items():
+
+        if value is None:
+            reasons.append(
+                f"{factor}: data unavailable and excluded from the score."
+            )
+
+        elif value == 1.0:
+            reasons.append(
+                f"{factor}: within the preferred range."
+            )
+
+        elif value == 0.5:
+            reasons.append(
+                f"{factor}: slightly outside the preferred range."
+            )
+
         else:
-            reasons.append(f"{factor}: outside the suitable range.")
+            reasons.append(
+                f"{factor}: outside the preferred range."
+            )
 
     if score >= 0.8:
         verdict = "Suitable"
@@ -60,3 +118,42 @@ def evaluate(climate: dict, soil: dict, thresholds: dict):
         verdict = "Not suitable"
 
     return verdict, score, reasons
+
+
+def get_factor_scores(climate: dict, soil: dict, thresholds: dict):
+    """
+    Return detailed factor information for dashboard displays.
+    """
+
+    return {
+        "Temperature": {
+            "value": climate.get("temp_c"),
+            "low": thresholds["temp_c"][0],
+            "high": thresholds["temp_c"][1],
+            "score": _score_range(
+                climate.get("temp_c"),
+                *thresholds["temp_c"],
+            ),
+            "unit": "°C",
+        },
+        "Rainfall": {
+            "value": climate.get("rain_mm_year"),
+            "low": thresholds["rain_mm"][0],
+            "high": thresholds["rain_mm"][1],
+            "score": _score_range(
+                climate.get("rain_mm_year"),
+                *thresholds["rain_mm"],
+            ),
+            "unit": "mm/year",
+        },
+        "Soil pH": {
+            "value": soil.get("ph"),
+            "low": thresholds["ph"][0],
+            "high": thresholds["ph"][1],
+            "score": _score_range(
+                soil.get("ph"),
+                *thresholds["ph"],
+            ),
+            "unit": "pH",
+        },
+    }
