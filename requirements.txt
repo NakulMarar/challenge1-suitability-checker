@@ -3,6 +3,6 @@ folium
 streamlit-folium
 requests
 pillow
-transformers
+transformers==4.57.1
 torch
 torchvision
