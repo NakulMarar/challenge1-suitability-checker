@@ -64,64 +64,59 @@ CROP_THRESHOLDS = {
         "notes": "Deep-rooted and drought-tolerant once established, "
                  "but sensitive to acidic or poorly-drained soil.",
     },
+    "Potato": {
+        "temp_c": (10, 25),
+        "rain_mm": (500, 700),
+        "ph": (4.8, 6.5),
+        "notes": "Prefers cooler, slightly acidic soil; tubers rot in "
+                 "waterlogged ground and yield drops sharply above 30C.",
+    },
+    "Corn (Maize)": {
+        "temp_c": (18, 32),
+        "rain_mm": (500, 800),
+        "ph": (5.8, 7.0),
+        "notes": "Needs steady water through tasseling/silking; "
+                 "otherwise fairly heat-tolerant.",
+    },
+    "Bell Pepper": {
+        "temp_c": (18, 30),
+        "rain_mm": (600, 1200),
+        "ph": (5.5, 6.8),
+        "notes": "Sensitive to both frost and prolonged heat above "
+                 "~32C, which drops fruit set.",
+    },
+    "Onion": {
+        "temp_c": (13, 24),
+        "rain_mm": (350, 550),
+        "ph": (6.0, 7.0),
+        "notes": "Bulbing is day-length sensitive as well as "
+                 "temperature sensitive -- check variety fits your "
+                 "latitude if you take this further.",
+    },
+    "Lettuce": {
+        "temp_c": (7, 24),
+        "rain_mm": (300, 500),
+        "ph": (6.0, 6.8),
+        "notes": "Cool-season and heat-sensitive -- bolts (goes to "
+                 "seed, turns bitter) above ~27C. A greenhouse/shade "
+                 "candidate in hot climates.",
+    },
+    "Watermelon": {
+        "temp_c": (22, 35),
+        "rain_mm": (400, 600),
+        "ph": (6.0, 6.8),
+        "notes": "Heat-loving with deep roots once established; needs "
+                 "well-drained soil.",
+    },
+    "Eggplant": {
+        "temp_c": (20, 32),
+        "rain_mm": (600, 1000),
+        "ph": (5.5, 6.8),
+        "notes": "Similar heat tolerance to pepper; sensitive to cold "
+                 "snaps below 15C.",
+    },
 }
 
 # Simple, practical notes -- not a substitute for an agronomist. These
 # cover common PlantVillage classes; extend as needed. Keys should match
-# the model's raw label with underscores replaced by spaces, and the
-# plant name stripped off, at lookup time (see disease_model.py).
-DISEASE_TREATMENTS = {
-    "Healthy": "No signs of disease. Keep up current watering and "
-               "spacing; recheck every 1-2 weeks.",
-    "Early Blight": "Remove and destroy affected lower leaves, avoid "
-                     "overhead watering, apply a copper-based fungicide, "
-                     "and rotate crops next season.",
-    "Late Blight": "Remove infected plants promptly to stop spread, "
-                    "improve airflow between plants, and apply a "
-                    "fungicide labelled for late blight.",
-    "Leaf Mold": "Increase ventilation and reduce humidity around the "
-                  "canopy, avoid wetting leaves when watering, remove "
-                  "affected leaves.",
-    "Bacterial Spot": "Avoid overhead irrigation, remove infected "
-                       "material, disinfect tools between plants, use "
-                       "copper-based bactericide if available.",
-    "Powdery Mildew": "Improve air circulation, avoid excess nitrogen, "
-                       "apply sulfur or a potassium-bicarbonate spray.",
-    "Target Spot": "Remove infected leaves, avoid overhead watering, "
-                    "apply a labelled fungicide, rotate crops.",
-    "Septoria Leaf Spot": "Remove infected lower leaves, mulch to stop "
-                           "soil splashing onto foliage, apply a "
-                           "labelled fungicide, rotate crops.",
-    # Note: the PlantVillage tomato virus classes repeat the plant name
-    # inside the disease label itself (e.g. "Tomato___Tomato_mosaic_virus"),
-    # so the key needs "Tomato" in it too, not just the disease name.
-    "Tomato Mosaic Virus": "No cure -- remove and destroy infected "
-                            "plants to stop spread, wash hands/tools "
-                            "between plants (this virus spreads by "
-                            "contact), control aphids.",
-    "Tomato Yellow Leaf Curl Virus": "No cure -- remove infected "
-                                      "plants, control whiteflies "
-                                      "aggressively (their main "
-                                      "vector), use reflective mulch "
-                                      "or insect netting.",
-    "Common Rust": "Apply a labelled fungicide at first sign, avoid "
-                    "overhead watering, choose resistant varieties next "
-                    "planting.",
-    "Northern Leaf Blight": "Rotate crops, apply a labelled fungicide, "
-                             "remove crop debris after harvest.",
-    "Apple Scab": "Rake and destroy fallen leaves (where spores "
-                   "overwinter), improve airflow through pruning, "
-                   "apply a labelled fungicide in early spring.",
-    "Black Rot": "Prune out infected wood/fruit, remove mummified "
-                  "fruit, apply a labelled fungicide, improve airflow.",
-    "Cedar Apple Rust": "Remove nearby cedar/juniper hosts if "
-                         "practical, apply a labelled fungicide from "
-                         "pink-bud stage, choose resistant varieties.",
-}
-
-DEFAULT_TREATMENT = (
-    "Specific guidance for this exact label isn't in our lookup table yet. "
-    "General steps: isolate/remove the worst-affected leaves, avoid "
-    "overhead watering, improve airflow, and consult local agricultural "
-    "extension guidance for a targeted treatment."
-)
+# the model's raw label with underscores replaced by spaces,
