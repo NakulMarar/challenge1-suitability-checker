@@ -1046,22 +1046,35 @@ elif st.session_state.page == "ℹ️ About":
     st.subheader("ℹ️ About CropWise")
 
     st.markdown(
-        """
-        <div class="about-card">
+    """
+    <div style="
+        background: #000000;
+        color: #ffffff;
+        padding: 1.5rem;
+        border-radius: 18px;
+        border: 1px solid #222222;
+    ">
+        <h3 style="
+            color: #ffffff;
+            margin-top: 0;
+        ">
+            🌱 What is CropWise?
+        </h3>
 
-        <h3>🌱 What is CropWise?</h3>
+        <p style="color: #ffffff;">
+            CropWise is a land and crop suitability tool built
+            for <strong>Reboot the Earth 2026 – Challenge 1</strong>.
+        </p>
 
-        CropWise is a land and crop suitability tool built for
-        <strong>Reboot the Earth 2026 – Challenge 1</strong>.
-
-        It combines climate and soil information with transparent
-        crop suitability rules to help users understand which crops
-        may fit a location.
-
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+        <p style="color: #ffffff;">
+            It combines climate and soil information with transparent
+            crop suitability rules to help users understand which crops
+            may fit a location.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
     st.markdown(
         """
