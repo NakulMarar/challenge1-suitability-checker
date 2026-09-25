@@ -34,10 +34,10 @@ DEFAULT_LAT = 25.2854
 DEFAULT_LON = 51.5310
 
 PAGES = [
-    "🗺️ Analyze Land",
-    "🌾 Crop Finder",
-    "🔬 Disease AI",
-    "ℹ️ About",
+    "Analyze Land",
+    "Crop Finder",
+    "Disease AI",
+    "About",
 ]
 
 
@@ -91,32 +91,39 @@ def score_percent(score):
 
 def verdict_icon(verdict):
     return {
-        "Suitable": "🟢",
-        "Marginal": "🟡",
-        "Not suitable": "🔴",
-        "Unknown": "⚪",
-    }.get(verdict, "⚪")
+        "Suitable": "Good",
+        "Marginal": "Moderate",
+        "Not suitable": "Poor",
+        "Unknown": "Unknown",
+    }.get(verdict, "Unknown")
 
 
 def factor_status(score):
     if score is None:
         return "Unavailable"
+
     if score >= 0.8:
         return "Good"
+
     if score >= 0.5:
         return "Moderate"
+
     return "Poor"
 
 
 def format_factor_value(value, unit):
     if value is None:
         return "Unavailable"
+
     if unit == "°C":
         return f"{value:.1f} °C"
+
     if unit == "mm/year":
         return f"{value:,.0f} mm/year"
+
     if unit == "pH":
         return f"{value:.2f}"
+
     return str(value)
 
 
@@ -165,7 +172,7 @@ st.markdown(
     .hero p {
         margin-top: 0.45rem;
         margin-bottom: 0;
-        color: #48604f !important;
+        color: #365a43 !important;
         font-size: 1.05rem;
         opacity: 1 !important;
         visibility: visible !important;
@@ -188,6 +195,7 @@ st.markdown(
     .metric-value {
         font-size: 1.55rem;
         font-weight: 750;
+        color: #1f2937;
     }
 
     .factor-card {
@@ -196,11 +204,13 @@ st.markdown(
         border: 1px solid #e6e6e6;
         background: #ffffff;
         margin-bottom: 0.7rem;
+        color: #1f2937;
     }
 
     .factor-title {
         font-weight: 700;
         font-size: 1rem;
+        color: #1f2937;
     }
 
     .factor-detail {
@@ -214,6 +224,7 @@ st.markdown(
         border-radius: 18px;
         background: #e8f5e9;
         border: 1px solid #a5d6a7;
+        color: #1b4332;
     }
 
     .warning-box {
@@ -221,6 +232,7 @@ st.markdown(
         border-radius: 18px;
         background: #fff8e1;
         border: 1px solid #ffe082;
+        color: #5f4200;
     }
 
     .danger-box {
@@ -228,14 +240,27 @@ st.markdown(
         border-radius: 18px;
         background: #ffebee;
         border: 1px solid #ef9a9a;
+        color: #7f1d1d;
     }
 
     .about-card {
         padding: 1.2rem;
         border-radius: 18px;
-        border: 1px solid #e5e5e5;
-        background: white;
+        border: 1px solid #222222;
+        background: #000000;
+        color: #ffffff;
         margin-bottom: 1rem;
+    }
+
+    .about-card h3,
+    .about-card p,
+    .about-card li,
+    .about-card strong {
+        color: #ffffff !important;
+    }
+
+    .about-card h3 {
+        margin-top: 0;
     }
 
     footer {
@@ -253,6 +278,7 @@ st.markdown(
 # ============================================================
 
 with st.sidebar:
+
     st.markdown(
         """
         <div style="
@@ -260,8 +286,15 @@ with st.sidebar:
             padding:0.5rem 0 1rem 0;
         ">
             <div style="font-size:3rem;">🌱</div>
-            <h2 style="margin:0;">CropWise</h2>
-            <p style="color:#777;margin-top:0.2rem;">
+
+            <h2 style="margin:0;">
+                CropWise
+            </h2>
+
+            <p style="
+                color:#777;
+                margin-top:0.2rem;
+            ">
                 Smart land & crop suitability
             </p>
         </div>
@@ -270,9 +303,11 @@ with st.sidebar:
     )
 
     st.divider()
+
     st.markdown("### Navigation")
 
     for sidebar_page in PAGES:
+
         if st.button(
             sidebar_page,
             use_container_width=True,
@@ -283,11 +318,13 @@ with st.sidebar:
             ),
             key=f"sidebar_{sidebar_page}",
         ):
+
             if st.session_state.page != sidebar_page:
                 st.session_state.page = sidebar_page
                 st.rerun()
 
     st.divider()
+
     st.caption(
         "Reboot the Earth 2026\n\n"
         "Challenge 1 • Team 17"
@@ -332,17 +369,20 @@ if page != st.session_state.page:
 # ANALYZE LAND
 # ============================================================
 
-if st.session_state.page == "🗺️ Analyze Land":
+if st.session_state.page == "Analyze Land":
+
     st.subheader("Analyze a location")
 
     col1, col2 = st.columns([2.1, 1])
 
-    # --------------------------------------------------------
+
+    # ========================================================
     # MAP
-    # --------------------------------------------------------
+    # ========================================================
 
     with col1:
-        st.markdown("#### 📍 Select a location")
+
+        st.markdown("#### Select a location")
 
         m = folium.Map(
             location=[
@@ -354,6 +394,7 @@ if st.session_state.page == "🗺️ Analyze Land":
             control_scale=True,
         )
 
+        # Custom leaf marker
         leaf_html = """
         <div style="
             position: relative;
@@ -414,7 +455,9 @@ if st.session_state.page == "🗺️ Analyze Land":
                 st.session_state.lon,
             ],
             tooltip="Selected location",
-            icon=folium.DivIcon(html=leaf_html),
+            icon=folium.DivIcon(
+                html=leaf_html
+            ),
         ).add_to(m)
 
         map_data = st_folium(
@@ -426,14 +469,26 @@ if st.session_state.page == "🗺️ Analyze Land":
         )
 
         if map_data and map_data.get("last_clicked"):
+
             clicked = map_data["last_clicked"]
 
-            new_lat = round(float(clicked["lat"]), 5)
-            new_lon = round(float(clicked["lng"]), 5)
+            new_lat = round(
+                float(clicked["lat"]),
+                5,
+            )
 
-            click_key = (new_lat, new_lon)
+            new_lon = round(
+                float(clicked["lng"]),
+                5,
+            )
+
+            click_key = (
+                new_lat,
+                new_lon,
+            )
 
             if st.session_state.last_map_click != click_key:
+
                 st.session_state.last_map_click = click_key
 
                 st.session_state.lat = new_lat
@@ -444,11 +499,13 @@ if st.session_state.page == "🗺️ Analyze Land":
 
                 st.rerun()
 
-    # --------------------------------------------------------
+
+    # ========================================================
     # LOCATION CONTROLS
-    # --------------------------------------------------------
+    # ========================================================
 
     with col2:
+
         st.markdown("#### Coordinates")
 
         latitude = st.number_input(
@@ -477,34 +534,47 @@ if st.session_state.page == "🗺️ Analyze Land":
         )
 
         reset = st.button(
-            "↩️ Reset location",
+            "Reset location",
             use_container_width=True,
         )
 
         if reset:
+
             st.session_state.lat = DEFAULT_LAT
             st.session_state.lon = DEFAULT_LON
+
             st.session_state.latitude_input = DEFAULT_LAT
             st.session_state.longitude_input = DEFAULT_LON
+
             st.session_state.last_map_click = None
+
             reset_analysis()
+
             st.rerun()
 
-    # --------------------------------------------------------
+
+    # ========================================================
     # CROP SELECTION
-    # --------------------------------------------------------
+    # ========================================================
 
     st.divider()
-    st.subheader("🌾 Choose a crop")
 
-    crop_names = sorted(CROP_THRESHOLDS.keys())
-    crop_options = ["Select a crop..."] + crop_names
+    st.subheader("Choose a crop")
+
+    crop_names = sorted(
+        CROP_THRESHOLDS.keys()
+    )
+
+    crop_options = [
+        "Select a crop..."
+    ] + crop_names
 
     selected_crop = st.selectbox(
         "Crop",
         crop_options,
         index=0,
     )
+
 
     # --------------------------------------------------------
     # NO CROP SELECTED
@@ -513,9 +583,10 @@ if st.session_state.page == "🗺️ Analyze Land":
     if selected_crop == "Select a crop...":
 
         st.info(
-            "🌱 Select a crop to view its preferred conditions "
+            "Select a crop to view its preferred conditions "
             "and analyze this location."
         )
+
 
     # --------------------------------------------------------
     # CROP SELECTED
@@ -523,27 +594,38 @@ if st.session_state.page == "🗺️ Analyze Land":
 
     else:
 
-        thresholds = CROP_THRESHOLDS[selected_crop]
+        thresholds = CROP_THRESHOLDS[
+            selected_crop
+        ]
 
-        with st.expander("View preferred conditions"):
+        with st.expander(
+            "View preferred conditions"
+        ):
+
             c1, c2, c3 = st.columns(3)
 
             with c1:
+
                 st.metric(
                     "Temperature",
-                    f"{thresholds['temp_c'][0]}–{thresholds['temp_c'][1]} °C",
+                    f"{thresholds['temp_c'][0]}–"
+                    f"{thresholds['temp_c'][1]} °C",
                 )
 
             with c2:
+
                 st.metric(
                     "Rainfall",
-                    f"{thresholds['rain_mm'][0]:,}–{thresholds['rain_mm'][1]:,} mm",
+                    f"{thresholds['rain_mm'][0]:,}–"
+                    f"{thresholds['rain_mm'][1]:,} mm",
                 )
 
             with c3:
+
                 st.metric(
                     "Soil pH",
-                    f"{thresholds['ph'][0]}–{thresholds['ph'][1]}",
+                    f"{thresholds['ph'][0]}–"
+                    f"{thresholds['ph'][1]}",
                 )
 
         st.caption(
@@ -553,12 +635,13 @@ if st.session_state.page == "🗺️ Analyze Land":
             )
         )
 
+
         # ----------------------------------------------------
         # ANALYZE BUTTON
         # ----------------------------------------------------
 
         if st.button(
-            "🔎 Check this location",
+            "Check this location",
             type="primary",
             use_container_width=True,
         ):
@@ -599,15 +682,17 @@ if st.session_state.page == "🗺️ Analyze Land":
                 "factors": factors,
             }
 
-    # --------------------------------------------------------
+
+    # ========================================================
     # RESULTS
-    # --------------------------------------------------------
+    # ========================================================
 
     analysis = st.session_state.analysis
 
     if analysis:
 
         st.divider()
+
         st.subheader(
             f"Results for {analysis['crop']}"
         )
@@ -628,15 +713,18 @@ if st.session_state.page == "🗺️ Analyze Land":
             f"""
             <div class="{box_class}">
                 <h2 style="margin:0;">
-                    {verdict_icon(verdict)} {verdict}
+                    {verdict}
                 </h2>
+
                 <p style="
                     margin-top:0.5rem;
                     margin-bottom:0;
                     font-size:1.1rem;
                 ">
                     Suitability score:
-                    <strong>{score_percent(score)}%</strong>
+                    <strong>
+                        {score_percent(score)}%
+                    </strong>
                 </p>
             </div>
             """,
@@ -651,14 +739,19 @@ if st.session_state.page == "🗺️ Analyze Land":
         c1, c2, c3 = st.columns(3)
 
         with c1:
-            temp = climate.get("temp_c")
+
+            temp = climate.get(
+                "temp_c"
+            )
 
             st.markdown(
                 f"""
                 <div class="metric-card">
+
                     <div class="metric-title">
-                        🌡️ Average Temperature
+                        Average Temperature
                     </div>
+
                     <div class="metric-value">
                         {
                             f"{temp:.1f} °C"
@@ -666,20 +759,26 @@ if st.session_state.page == "🗺️ Analyze Land":
                             else "Unavailable"
                         }
                     </div>
+
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
 
         with c2:
-            rain = climate.get("rain_mm_year")
+
+            rain = climate.get(
+                "rain_mm_year"
+            )
 
             st.markdown(
                 f"""
                 <div class="metric-card">
+
                     <div class="metric-title">
-                        🌧️ Annual Rainfall
+                        Annual Rainfall
                     </div>
+
                     <div class="metric-value">
                         {
                             f"{rain:,.0f} mm"
@@ -687,20 +786,26 @@ if st.session_state.page == "🗺️ Analyze Land":
                             else "Unavailable"
                         }
                     </div>
+
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
 
         with c3:
-            ph = soil.get("ph")
+
+            ph = soil.get(
+                "ph"
+            )
 
             st.markdown(
                 f"""
                 <div class="metric-card">
+
                     <div class="metric-title">
-                        🧪 Soil pH
+                        Soil pH
                     </div>
+
                     <div class="metric-value">
                         {
                             f"{ph:.2f}"
@@ -708,31 +813,42 @@ if st.session_state.page == "🗺️ Analyze Land":
                             else "Unavailable"
                         }
                     </div>
+
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
 
         st.markdown("")
-        st.subheader("📊 Factor breakdown")
 
-        for factor_name, factor in analysis["factors"].items():
+        st.subheader(
+            "Factor breakdown"
+        )
+
+        for factor_name, factor in analysis[
+            "factors"
+        ].items():
 
             value = factor["value"]
             low = factor["low"]
             high = factor["high"]
             score_value = factor["score"]
             unit = factor["unit"]
-            status = factor_status(score_value)
+
+            status = factor_status(
+                score_value
+            )
 
             st.markdown(
                 f"""
                 <div class="factor-card">
+
                     <div style="
                         display:flex;
                         justify-content:space-between;
                         align-items:center;
                     ">
+
                         <div class="factor-title">
                             {factor_name}
                         </div>
@@ -741,14 +857,22 @@ if st.session_state.page == "🗺️ Analyze Land":
                             <strong>
                                 {score_percent(score_value)}%
                             </strong>
-                            &nbsp;•&nbsp; {status}
+
+                            &nbsp;•&nbsp;
+
+                            {status}
                         </div>
+
                     </div>
 
                     <div class="factor-detail">
+
                         Actual:
                         <strong>
-                            {format_factor_value(value, unit)}
+                            {format_factor_value(
+                                value,
+                                unit
+                            )}
                         </strong>
 
                         &nbsp; | &nbsp;
@@ -757,31 +881,44 @@ if st.session_state.page == "🗺️ Analyze Land":
                         <strong>
                             {low:g}–{high:g} {unit}
                         </strong>
+
                     </div>
+
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
 
-        st.subheader("💡 Why this result?")
+        st.subheader(
+            "Why this result?"
+        )
 
         for reason in analysis["reasons"]:
-            st.write("•", reason)
+            st.write(
+                "•",
+                reason,
+            )
 
         if climate.get("error"):
-            st.warning(climate["error"])
+            st.warning(
+                climate["error"]
+            )
 
         if soil.get("error"):
-            st.warning(soil["error"])
+            st.warning(
+                soil["error"]
+            )
 
 
 # ============================================================
 # CROP FINDER
 # ============================================================
 
-elif st.session_state.page == "🌾 Crop Finder":
+elif st.session_state.page == "Crop Finder":
 
-    st.subheader("🌾 Crop Finder")
+    st.subheader(
+        "Crop Finder"
+    )
 
     st.write(
         "Find crops that match the climate and soil conditions "
@@ -791,29 +928,35 @@ elif st.session_state.page == "🌾 Crop Finder":
     c1, c2 = st.columns(2)
 
     with c1:
+
         finder_lat = st.number_input(
             "Latitude",
             min_value=-90.0,
             max_value=90.0,
             step=0.0001,
             format="%.5f",
-            value=float(st.session_state.lat),
+            value=float(
+                st.session_state.lat
+            ),
             key="finder_lat",
         )
 
     with c2:
+
         finder_lon = st.number_input(
             "Longitude",
             min_value=-180.0,
             max_value=180.0,
             step=0.0001,
             format="%.5f",
-            value=float(st.session_state.lon),
+            value=float(
+                st.session_state.lon
+            ),
             key="finder_lon",
         )
 
     if st.button(
-        "🌱 Find suitable crops",
+        "Find suitable crops",
         type="primary",
         use_container_width=True,
     ):
@@ -866,7 +1009,10 @@ elif st.session_state.page == "🌾 Crop Finder":
         "crop_results"
     )
 
-    if isinstance(finder, dict):
+    if isinstance(
+        finder,
+        dict,
+    ):
 
         results = finder.get(
             "results",
@@ -876,7 +1022,10 @@ elif st.session_state.page == "🌾 Crop Finder":
         if results:
 
             st.divider()
-            st.subheader("🌿 Matching crops")
+
+            st.subheader(
+                "Matching crops"
+            )
 
             for result in results[:12]:
 
@@ -895,20 +1044,27 @@ elif st.session_state.page == "🌾 Crop Finder":
                         ">
 
                             <div>
+
                                 <strong>
-                                    {safe_text(result["crop"])}
+                                    {safe_text(
+                                        result["crop"]
+                                    )}
                                 </strong>
 
                                 <div class="factor-detail">
-                                    {verdict_icon(result["verdict"])}
-                                    {safe_text(result["verdict"])}
+                                    {safe_text(
+                                        result["verdict"]
+                                    )}
                                 </div>
+
                             </div>
 
                             <div>
+
                                 <strong>
                                     {score}%
                                 </strong>
+
                             </div>
 
                         </div>
@@ -923,9 +1079,11 @@ elif st.session_state.page == "🌾 Crop Finder":
 # DISEASE AI
 # ============================================================
 
-elif st.session_state.page == "🔬 Disease AI":
+elif st.session_state.page == "Disease AI":
 
-    st.subheader("🔬 Plant Disease AI")
+    st.subheader(
+        "Plant Disease AI"
+    )
 
     st.write(
         "Upload a clear leaf image and the AI will identify "
@@ -955,7 +1113,7 @@ elif st.session_state.page == "🔬 Disease AI":
         )
 
         if st.button(
-            "🔬 Analyze leaf",
+            "Analyze leaf",
             type="primary",
             use_container_width=True,
         ):
@@ -989,7 +1147,10 @@ elif st.session_state.page == "🔬 Disease AI":
     if disease_results:
 
         st.divider()
-        st.subheader("AI results")
+
+        st.subheader(
+            "AI results"
+        )
 
         best = disease_results[0]
 
@@ -1000,14 +1161,14 @@ elif st.session_state.page == "🔬 Disease AI":
         if disease == "Healthy":
 
             st.success(
-                f"🌿 The AI predicts that the {plant} leaf "
-                f"looks healthy."
+                f"The AI predicts that the "
+                f"{plant} leaf looks healthy."
             )
 
         else:
 
             st.warning(
-                f"⚠️ Possible condition: **{disease}**"
+                f"Possible condition: {disease}"
             )
 
         st.metric(
@@ -1021,12 +1182,14 @@ elif st.session_state.page == "🔬 Disease AI":
         )
 
         st.info(
-            f"💡 **Suggested action:** {treatment}"
+            f"Suggested action: {treatment}"
         )
 
         if len(disease_results) > 1:
 
-            with st.expander("Other possibilities"):
+            with st.expander(
+                "Other possibilities"
+            ):
 
                 for result in disease_results[1:]:
 
@@ -1041,54 +1204,30 @@ elif st.session_state.page == "🔬 Disease AI":
 # ABOUT
 # ============================================================
 
-elif st.session_state.page == "ℹ️ About":
+elif st.session_state.page == "About":
 
-    st.subheader("ℹ️ About CropWise")
-
-    st.markdown(
-    """
-    <div style="
-        background: #000000;
-        color: #ffffff;
-        padding: 1.5rem;
-        border-radius: 18px;
-        border: 1px solid #222222;
-    ">
-        <h3 style="
-            color: #ffffff;
-            margin-top: 0;
-        ">
-            🌱 What is CropWise?
-        </h3>
-
-        <p style="color: #ffffff;">
-            CropWise is a land and crop suitability tool built
-            for <strong>Reboot the Earth 2026 – Challenge 1</strong>.
-        </p>
-
-        <p style="color: #ffffff;">
-            It combines climate and soil information with transparent
-            crop suitability rules to help users understand which crops
-            may fit a location.
-        </p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+    st.subheader(
+        "About CropWise"
+    )
 
     st.markdown(
         """
         <div class="about-card">
 
-        <h3>🌍 Data sources</h3>
+            <h3>
+                What is CropWise?
+            </h3>
 
-        <ul>
-            <li><strong>NASA POWER</strong> — climate data</li>
-            <li><strong>SoilGrids / ISRIC</strong> — soil pH</li>
-            <li><strong>OpenStreetMap</strong> — map data</li>
-            <li><strong>PlantVillage</strong> — disease dataset</li>
-            <li><strong>Hugging Face</strong> — disease model</li>
-        </ul>
+            <p>
+                CropWise is a land and crop suitability tool built
+                for <strong>Reboot the Earth 2026 – Challenge 1</strong>.
+            </p>
+
+            <p>
+                It combines climate and soil information with
+                transparent crop suitability rules to help users
+                understand which crops may fit a location.
+            </p>
 
         </div>
         """,
@@ -1099,23 +1238,65 @@ elif st.session_state.page == "ℹ️ About":
         """
         <div class="about-card">
 
-        <h3>🧠 How suitability is calculated</h3>
+            <h3>
+                Data sources
+            </h3>
 
-        CropWise compares:
+            <ul>
+                <li>
+                    <strong>NASA POWER</strong> — climate data
+                </li>
 
-        <ul>
-            <li>Average temperature</li>
-            <li>Annual rainfall</li>
-            <li>Soil pH</li>
-        </ul>
+                <li>
+                    <strong>SoilGrids / ISRIC</strong> — soil pH
+                </li>
 
-        The available factors are combined into a transparent
-        suitability score.
+                <li>
+                    <strong>OpenStreetMap</strong> — map data
+                </li>
 
-        <br><br>
+                <li>
+                    <strong>PlantVillage</strong> — disease dataset
+                </li>
 
-        <strong>Important:</strong> The result is a screening
-        indicator, not a guaranteed prediction of crop yield.
+                <li>
+                    <strong>Hugging Face</strong> — disease model
+                </li>
+            </ul>
+
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        """
+        <div class="about-card">
+
+            <h3>
+                How suitability is calculated
+            </h3>
+
+            <p>
+                CropWise compares:
+            </p>
+
+            <ul>
+                <li>Average temperature</li>
+                <li>Annual rainfall</li>
+                <li>Soil pH</li>
+            </ul>
+
+            <p>
+                The available factors are combined into a
+                transparent suitability score.
+            </p>
+
+            <p>
+                <strong>Important:</strong>
+                The result is a screening indicator,
+                not a guaranteed prediction of crop yield.
+            </p>
 
         </div>
         """,
@@ -1130,5 +1311,5 @@ elif st.session_state.page == "ℹ️ About":
 st.divider()
 
 st.caption(
-    "🌱 CropWise • Reboot the Earth 2026 • Challenge 1 • Team 17"
+    "CropWise • Reboot the Earth 2026 • Challenge 1 • Team 17"
 )
