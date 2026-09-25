@@ -34,6 +34,13 @@ st.set_page_config(
 DEFAULT_LAT = 25.2854
 DEFAULT_LON = 51.5310
 
+PAGES = [
+    "🗺️ Analyze Land",
+    "🌾 Crop Finder",
+    "🔬 Disease AI",
+    "ℹ️ About",
+]
+
 
 # ============================================================
 # SESSION STATE
@@ -45,9 +52,6 @@ if "lat" not in st.session_state:
 if "lon" not in st.session_state:
     st.session_state.lon = DEFAULT_LON
 
-# FIX:
-# Keep the coordinate input widgets synchronized with
-# the actual selected map location.
 if "latitude_input" not in st.session_state:
     st.session_state.latitude_input = DEFAULT_LAT
 
@@ -63,18 +67,19 @@ if "crop_results" not in st.session_state:
 if "disease_results" not in st.session_state:
     st.session_state.disease_results = None
 
+if "page" not in st.session_state:
+    st.session_state.page = PAGES[0]
+
 
 # ============================================================
 # HELPERS
 # ============================================================
 
 def safe_text(value):
-    """Safely escape text before inserting it into HTML."""
     return html.escape(str(value))
 
 
 def render_html(content):
-    """Render compact custom HTML."""
     st.markdown(
         "\n".join(
             line.strip()
@@ -193,7 +198,9 @@ hr {
 }
 
 
-/* SIDEBAR */
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
 
 [data-testid="stSidebar"] {
     background: #0d120f !important;
@@ -204,8 +211,19 @@ hr {
     color: #e8eee9 !important;
 }
 
+.sidebar-nav-title {
+    color: #91a49a !important;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
 
-/* HERO */
+
+/* ============================================================
+   HERO
+   ============================================================ */
 
 .hero {
     background:
@@ -254,7 +272,9 @@ hr {
 }
 
 
-/* CARDS */
+/* ============================================================
+   CARDS
+   ============================================================ */
 
 .card {
     background: #101612;
@@ -280,7 +300,9 @@ hr {
 }
 
 
-/* STEP CARDS */
+/* ============================================================
+   STEP CARDS
+   ============================================================ */
 
 .step {
     background: #101612;
@@ -303,7 +325,9 @@ hr {
 }
 
 
-/* SCORE */
+/* ============================================================
+   SCORE
+   ============================================================ */
 
 .score-card {
     background:
@@ -341,7 +365,9 @@ hr {
 }
 
 
-/* FACTORS */
+/* ============================================================
+   FACTORS
+   ============================================================ */
 
 .factor-card {
     background: #101612;
@@ -387,7 +413,9 @@ hr {
 }
 
 
-/* CROP CARDS */
+/* ============================================================
+   CROP CARDS
+   ============================================================ */
 
 .crop-card {
     background: #101612;
@@ -409,7 +437,9 @@ hr {
 }
 
 
-/* NAV */
+/* ============================================================
+   TOP NAV
+   ============================================================ */
 
 div[role="radiogroup"] {
     background: #101612;
@@ -431,7 +461,9 @@ div[role="radiogroup"] label:hover {
 }
 
 
-/* INPUTS */
+/* ============================================================
+   INPUTS
+   ============================================================ */
 
 input {
     background: #101612 !important;
@@ -444,7 +476,9 @@ div[data-baseweb="select"] > div {
 }
 
 
-/* BUTTONS */
+/* ============================================================
+   BUTTONS
+   ============================================================ */
 
 .stButton > button {
     border-radius: 11px !important;
@@ -453,14 +487,18 @@ div[data-baseweb="select"] > div {
 }
 
 
-/* MAP */
+/* ============================================================
+   MAP
+   ============================================================ */
 
 iframe {
     border-radius: 17px !important;
 }
 
 
-/* FOOTER */
+/* ============================================================
+   FOOTER
+   ============================================================ */
 
 .footer {
     text-align: center;
@@ -505,12 +543,62 @@ with st.sidebar:
 
     st.divider()
 
-    st.markdown("### 🧭 Explore")
+    st.markdown(
+        '<div class="sidebar-nav-title">🧭 Explore</div>',
+        unsafe_allow_html=True,
+    )
 
-    st.write("🗺️ Analyze Land")
-    st.write("🌾 Crop Finder")
-    st.write("🔬 Disease AI")
-    st.write("ℹ️ About")
+    # --------------------------------------------------------
+    # CLICKABLE SIDEBAR NAVIGATION
+    # --------------------------------------------------------
+
+    if st.button(
+        "🗺️ Analyze Land",
+        use_container_width=True,
+        type=(
+            "primary"
+            if st.session_state.page == "🗺️ Analyze Land"
+            else "secondary"
+        ),
+    ):
+        st.session_state.page = "🗺️ Analyze Land"
+        st.rerun()
+
+    if st.button(
+        "🌾 Crop Finder",
+        use_container_width=True,
+        type=(
+            "primary"
+            if st.session_state.page == "🌾 Crop Finder"
+            else "secondary"
+        ),
+    ):
+        st.session_state.page = "🌾 Crop Finder"
+        st.rerun()
+
+    if st.button(
+        "🔬 Disease AI",
+        use_container_width=True,
+        type=(
+            "primary"
+            if st.session_state.page == "🔬 Disease AI"
+            else "secondary"
+        ),
+    ):
+        st.session_state.page = "🔬 Disease AI"
+        st.rerun()
+
+    if st.button(
+        "ℹ️ About",
+        use_container_width=True,
+        type=(
+            "primary"
+            if st.session_state.page == "ℹ️ About"
+            else "secondary"
+        ),
+    ):
+        st.session_state.page = "ℹ️ About"
+        st.rerun()
 
     st.divider()
 
@@ -529,20 +617,21 @@ with st.sidebar:
 
 
 # ============================================================
-# NAVIGATION
+# TOP NAVIGATION
 # ============================================================
 
 page = st.radio(
     "Navigation",
-    [
-        "🗺️ Analyze Land",
-        "🌾 Crop Finder",
-        "🔬 Disease AI",
-        "ℹ️ About",
-    ],
+    PAGES,
+    index=PAGES.index(st.session_state.page),
     horizontal=True,
     label_visibility="collapsed",
 )
+
+# Keep sidebar and top navigation synchronized
+if page != st.session_state.page:
+    st.session_state.page = page
+
 
 st.divider()
 
@@ -560,7 +649,6 @@ if page == "🗺️ Analyze Land":
         "the environmental conditions."
     )
 
-    # WORKFLOW
     step_cols = st.columns(3)
 
     with step_cols[0]:
@@ -639,10 +727,7 @@ if page == "🗺️ Analyze Land":
             key="main_land_map",
         )
 
-        # ====================================================
-        # FIXED MAP LOCATION UPDATE
-        # ====================================================
-
+        # FIXED MAP LOCATION
         if map_data and map_data.get("last_clicked"):
 
             new_lat = round(
@@ -655,13 +740,10 @@ if page == "🗺️ Analyze Land":
                 5,
             )
 
-            # Update the actual location
             st.session_state.lat = new_lat
             st.session_state.lon = new_lon
 
-            # IMPORTANT:
-            # Also update the number inputs so their old
-            # Doha values don't overwrite the map selection.
+            # Keep number inputs synchronized
             st.session_state.latitude_input = new_lat
             st.session_state.longitude_input = new_lon
 
@@ -929,6 +1011,7 @@ reference range using transparent rules.
         ):
 
             value = factor["value"]
+
             percentage = score_percent(
                 factor["score"]
             )
