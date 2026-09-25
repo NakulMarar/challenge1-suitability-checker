@@ -17,12 +17,16 @@ agricultural yield prediction.
 
 def _score_range(value, low, high):
     """
-    Return:
+    Return a smooth 0.0-1.0 score:
 
-        1.0 -> inside preferred range
-        0.5 -> slightly outside preferred range
-        0.0 -> significantly outside preferred range
+        1.0  -> right in the middle of comfort, tapering to
+        ~1.0 -> at the edge of the preferred range
+        0.0  -> a full range-width or more beyond the edge
         None -> missing data
+
+    This is continuous on purpose (not fixed 1.0/0.5/0.0 steps) so the
+    overall percentage can land anywhere, not just on a few repeated
+    numbers like 50% or 100%.
     """
 
     if value is None:
@@ -38,7 +42,9 @@ def _score_range(value, low, high):
     else:
         distance = (value - high) / span
 
-    return 0.5 if distance <= 0.25 else 0.0
+    score = max(0.0, 1.0 - distance)
+
+    return round(score, 3)
 
 
 def evaluate(climate: dict, soil: dict, thresholds: dict):
@@ -95,19 +101,20 @@ def evaluate(climate: dict, soil: dict, thresholds: dict):
                 f"{factor}: data unavailable and excluded from the score."
             )
 
-        elif value == 1.0:
+        elif value >= 0.999:
             reasons.append(
                 f"{factor}: within the preferred range."
             )
 
-        elif value == 0.5:
+        elif value > 0:
             reasons.append(
-                f"{factor}: slightly outside the preferred range."
+                f"{factor}: outside the preferred range "
+                f"({round(value * 100)}% match)."
             )
 
         else:
             reasons.append(
-                f"{factor}: outside the preferred range."
+                f"{factor}: well outside the preferred range."
             )
 
     if score >= 0.8:
