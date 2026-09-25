@@ -4,7 +4,11 @@ import folium
 from streamlit_folium import st_folium
 from PIL import Image
 
-from crop_data import CROP_THRESHOLDS, DISEASE_TREATMENTS, DEFAULT_TREATMENT
+from crop_data import (
+    CROP_THRESHOLDS,
+    DISEASE_TREATMENTS,
+    DEFAULT_TREATMENT,
+)
 from data_sources import fetch_climate, fetch_soil
 from suitability import evaluate, get_factor_scores
 from disease_model import load_model, predict
@@ -61,6 +65,12 @@ if "disease_results" not in st.session_state:
 
 if "last_map_click" not in st.session_state:
     st.session_state.last_map_click = None
+
+if "latitude_input" not in st.session_state:
+    st.session_state.latitude_input = DEFAULT_LAT
+
+if "longitude_input" not in st.session_state:
+    st.session_state.longitude_input = DEFAULT_LON
 
 
 # ============================================================
@@ -124,7 +134,7 @@ def reset_analysis():
 
 
 # ============================================================
-# CSS
+# CUSTOM CSS
 # ============================================================
 
 st.markdown(
@@ -147,7 +157,7 @@ st.markdown(
             #e0f2f1 100%
         );
         border: 1px solid #c8e6c9;
-        margin-bottom: 1.3rem;
+        margin-bottom: 1rem;
     }
 
     .hero h1 {
@@ -278,7 +288,6 @@ with st.sidebar:
             ),
             key=f"sidebar_{sidebar_page}",
         ):
-
             if st.session_state.page != sidebar_page:
                 st.session_state.page = sidebar_page
                 st.rerun()
@@ -289,22 +298,6 @@ with st.sidebar:
         "Reboot the Earth 2026\n\n"
         "Challenge 1 • Team 17"
     )
-
-
-# ============================================================
-# TOP NAVIGATION
-# ============================================================
-
-page = st.radio(
-    "Navigation",
-    PAGES,
-    index=PAGES.index(st.session_state.page),
-    horizontal=True,
-    label_visibility="collapsed",
-)
-
-if page != st.session_state.page:
-    st.session_state.page = page
 
 
 # ============================================================
@@ -323,6 +316,22 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+# ============================================================
+# TOP NAVIGATION
+# ============================================================
+
+page = st.radio(
+    "Navigation",
+    PAGES,
+    index=PAGES.index(st.session_state.page),
+    horizontal=True,
+    label_visibility="collapsed",
+)
+
+if page != st.session_state.page:
+    st.session_state.page = page
 
 
 # ============================================================
@@ -353,7 +362,68 @@ if st.session_state.page == "🗺️ Analyze Land":
             control_scale=True,
         )
 
+        # Optional alternate map layer
+        folium.TileLayer(
+            tiles="CartoDB positron",
+            name="Light map",
+            control=True,
+        ).add_to(m)
+
         # Custom leaf marker
+        leaf_html = """
+        <div style="
+            position: relative;
+            width: 48px;
+            height: 58px;
+            transform: translate(-12px, -50px);
+        ">
+            <div style="
+                width: 42px;
+                height: 42px;
+                border-radius: 50%;
+                background: white;
+                border: 2px solid #43A047;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: absolute;
+                top: 0;
+                left: 0;
+            ">
+                <svg
+                    width="25"
+                    height="25"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M20.7 3.3C14.1 3.5 8.8 5.1 5.7 8.2C2.8 11.1 3.1 15.7 4.2 18.1C6.6 19.2 11.2 19.5 14.1 16.6C17.2 13.5 18.8 8.2 20.7 3.3Z"
+                        fill="#4CAF50"
+                    />
+                    <path
+                        d="M4.5 19.5C7.2 15.6 10.4 12.5 15.5 9.5"
+                        stroke="#1B5E20"
+                        stroke-width="1.6"
+                        stroke-linecap="round"
+                    />
+                </svg>
+            </div>
+
+            <div style="
+                position: absolute;
+                top: 38px;
+                left: 17px;
+                width: 0;
+                height: 0;
+                border-left: 6px solid transparent;
+                border-right: 6px solid transparent;
+                border-top: 10px solid #43A047;
+            "></div>
+        </div>
+        """
+
         folium.Marker(
             [
                 st.session_state.lat,
@@ -361,41 +431,20 @@ if st.session_state.page == "🗺️ Analyze Land":
             ],
             tooltip="Selected location",
             icon=folium.DivIcon(
-                html="""
-                <div style="
-                    width: 42px;
-                    height: 42px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transform: translate(-7px, -7px);
-                ">
-                    <div style="
-                        width: 34px;
-                        height: 34px;
-                        border-radius: 50%;
-                        background: white;
-                        border: 2px solid #43A047;
-                        box-shadow: 0 3px 10px rgba(0,0,0,0.25);
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-size: 21px;
-                    ">
-                        🌿
-                    </div>
-                </div>
-                """
+                html=leaf_html
             ),
+        ).add_to(m)
+
+        folium.LayerControl(
+            position="topright",
+            collapsed=True,
         ).add_to(m)
 
         map_data = st_folium(
             m,
             height=470,
             width=None,
-            returned_objects=[
-                "last_clicked",
-            ],
+            returned_objects=["last_clicked"],
             key="cropwise_map",
         )
 
@@ -446,7 +495,6 @@ if st.session_state.page == "🗺️ Analyze Land":
             "Latitude",
             min_value=-90.0,
             max_value=90.0,
-            value=float(st.session_state.lat),
             step=0.0001,
             format="%.5f",
             key="latitude_input",
@@ -456,7 +504,6 @@ if st.session_state.page == "🗺️ Analyze Land":
             "Longitude",
             min_value=-180.0,
             max_value=180.0,
-            value=float(st.session_state.lon),
             step=0.0001,
             format="%.5f",
             key="longitude_input",
@@ -468,8 +515,6 @@ if st.session_state.page == "🗺️ Analyze Land":
         st.caption(
             "Click anywhere on the map or enter coordinates manually."
         )
-
-        st.markdown("")
 
         reset = st.button(
             "↩️ Reset location",
@@ -490,7 +535,6 @@ if st.session_state.page == "🗺️ Analyze Land":
 
             st.rerun()
 
-
     # --------------------------------------------------------
     # CROP SELECTION
     # --------------------------------------------------------
@@ -501,14 +545,16 @@ if st.session_state.page == "🗺️ Analyze Land":
 
     crop_names = sorted(CROP_THRESHOLDS.keys())
 
+    default_crop = (
+        "Wheat"
+        if "Wheat" in crop_names
+        else crop_names[0]
+    )
+
     selected_crop = st.selectbox(
         "Crop",
         crop_names,
-        index=(
-            crop_names.index("Wheat")
-            if "Wheat" in crop_names
-            else 0
-        ),
+        index=crop_names.index(default_crop),
     )
 
     thresholds = CROP_THRESHOLDS[selected_crop]
@@ -636,10 +682,6 @@ if st.session_state.page == "🗺️ Analyze Land":
 
         st.markdown("")
 
-        # ----------------------------------------------------
-        # CLIMATE / SOIL METRICS
-        # ----------------------------------------------------
-
         climate = analysis["climate"]
         soil = analysis["soil"]
 
@@ -656,7 +698,11 @@ if st.session_state.page == "🗺️ Analyze Land":
                         🌡️ Average Temperature
                     </div>
                     <div class="metric-value">
-                        {f"{temp:.1f} °C" if temp is not None else "Unavailable"}
+                        {
+                            f"{temp:.1f} °C"
+                            if temp is not None
+                            else "Unavailable"
+                        }
                     </div>
                 </div>
                 """,
@@ -674,7 +720,11 @@ if st.session_state.page == "🗺️ Analyze Land":
                         🌧️ Annual Rainfall
                     </div>
                     <div class="metric-value">
-                        {f"{rain:,.0f} mm" if rain is not None else "Unavailable"}
+                        {
+                            f"{rain:,.0f} mm"
+                            if rain is not None
+                            else "Unavailable"
+                        }
                     </div>
                 </div>
                 """,
@@ -692,16 +742,16 @@ if st.session_state.page == "🗺️ Analyze Land":
                         🧪 Soil pH
                     </div>
                     <div class="metric-value">
-                        {f"{ph:.2f}" if ph is not None else "Unavailable"}
+                        {
+                            f"{ph:.2f}"
+                            if ph is not None
+                            else "Unavailable"
+                        }
                     </div>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
-
-        # ----------------------------------------------------
-        # FACTORS
-        # ----------------------------------------------------
 
         st.markdown("")
         st.subheader("📊 Factor breakdown")
@@ -761,28 +811,16 @@ if st.session_state.page == "🗺️ Analyze Land":
                 unsafe_allow_html=True,
             )
 
-        # ----------------------------------------------------
-        # EXPLANATION
-        # ----------------------------------------------------
-
         st.subheader("💡 Why this result?")
 
         for reason in analysis["reasons"]:
             st.write("•", reason)
 
-        # ----------------------------------------------------
-        # API ERRORS
-        # ----------------------------------------------------
-
         if climate.get("error"):
-            st.warning(
-                climate["error"]
-            )
+            st.warning(climate["error"])
 
         if soil.get("error"):
-            st.warning(
-                soil["error"]
-            )
+            st.warning(soil["error"])
 
 
 # ============================================================
@@ -801,26 +839,24 @@ elif st.session_state.page == "🌾 Crop Finder":
     c1, c2 = st.columns(2)
 
     with c1:
-
         finder_lat = st.number_input(
             "Latitude",
             min_value=-90.0,
             max_value=90.0,
-            value=float(st.session_state.lat),
             step=0.0001,
             format="%.5f",
+            value=float(st.session_state.lat),
             key="finder_lat",
         )
 
     with c2:
-
         finder_lon = st.number_input(
             "Longitude",
             min_value=-180.0,
             max_value=180.0,
-            value=float(st.session_state.lon),
             step=0.0001,
             format="%.5f",
+            value=float(st.session_state.lon),
             key="finder_lon",
         )
 
@@ -874,28 +910,19 @@ elif st.session_state.page == "🌾 Crop Finder":
                 "results": results,
             }
 
-    finder = st.session_state.get(
-        "crop_results"
-    )
+    finder = st.session_state.get("crop_results")
 
     if isinstance(finder, dict):
 
-        results = finder.get(
-            "results",
-            [],
-        )
+        results = finder.get("results", [])
 
         if results:
 
             st.divider()
 
-            st.subheader(
-                "🌿 Matching crops"
-            )
+            st.subheader("🌿 Matching crops")
 
-            top_results = results[:12]
-
-            for result in top_results:
+            for result in results[:12]:
 
                 score = score_percent(
                     result["score"]
@@ -961,9 +988,7 @@ elif st.session_state.page == "🔬 Disease AI":
 
     if uploaded_file:
 
-        image = Image.open(
-            uploaded_file
-        )
+        image = Image.open(uploaded_file)
 
         st.image(
             image,
@@ -1007,9 +1032,7 @@ elif st.session_state.page == "🔬 Disease AI":
 
         st.divider()
 
-        st.subheader(
-            "AI results"
-        )
+        st.subheader("AI results")
 
         best = disease_results[0]
 
@@ -1046,9 +1069,7 @@ elif st.session_state.page == "🔬 Disease AI":
 
         if len(disease_results) > 1:
 
-            with st.expander(
-                "Other possibilities"
-            ):
+            with st.expander("Other possibilities"):
 
                 for result in disease_results[1:]:
 
