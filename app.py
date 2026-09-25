@@ -45,6 +45,15 @@ if "lat" not in st.session_state:
 if "lon" not in st.session_state:
     st.session_state.lon = DEFAULT_LON
 
+# FIX:
+# Keep the coordinate input widgets synchronized with
+# the actual selected map location.
+if "latitude_input" not in st.session_state:
+    st.session_state.latitude_input = DEFAULT_LAT
+
+if "longitude_input" not in st.session_state:
+    st.session_state.longitude_input = DEFAULT_LON
+
 if "analysis" not in st.session_state:
     st.session_state.analysis = None
 
@@ -551,6 +560,7 @@ if page == "🗺️ Analyze Land":
         "the environmental conditions."
     )
 
+    # WORKFLOW
     step_cols = st.columns(3)
 
     with step_cols[0]:
@@ -629,19 +639,31 @@ if page == "🗺️ Analyze Land":
             key="main_land_map",
         )
 
+        # ====================================================
+        # FIXED MAP LOCATION UPDATE
+        # ====================================================
+
         if map_data and map_data.get("last_clicked"):
 
-            st.session_state.lat = round(
+            new_lat = round(
                 float(map_data["last_clicked"]["lat"]),
                 5,
             )
 
-            st.session_state.lon = round(
+            new_lon = round(
                 float(map_data["last_clicked"]["lng"]),
                 5,
             )
 
-            st.rerun()
+            # Update the actual location
+            st.session_state.lat = new_lat
+            st.session_state.lon = new_lon
+
+            # IMPORTANT:
+            # Also update the number inputs so their old
+            # Doha values don't overwrite the map selection.
+            st.session_state.latitude_input = new_lat
+            st.session_state.longitude_input = new_lon
 
     with location_col:
 
@@ -687,13 +709,19 @@ Use the map or type coordinates manually.
             "↩️ Reset location",
             use_container_width=True,
         ):
+
             st.session_state.lat = DEFAULT_LAT
             st.session_state.lon = DEFAULT_LON
+
+            st.session_state.latitude_input = DEFAULT_LAT
+            st.session_state.longitude_input = DEFAULT_LON
+
             reset_analysis()
             st.rerun()
 
     st.divider()
 
+    # CROP
     st.header("🌾 Select a crop")
 
     crop_options = [
@@ -901,7 +929,6 @@ reference range using transparent rules.
         ):
 
             value = factor["value"]
-
             percentage = score_percent(
                 factor["score"]
             )
@@ -1106,10 +1133,6 @@ elif page == "🌾 Crop Finder":
                 "soil": soil,
             }
 
-    # ========================================================
-    # FIXED CROP FINDER STATE HANDLING
-    # ========================================================
-
     finder = st.session_state.get("crop_results")
 
     if isinstance(finder, dict):
@@ -1123,10 +1146,6 @@ elif page == "🌾 Crop Finder":
     if results:
 
         st.subheader("🌿 Crop matches")
-
-        # ----------------------------------------------------
-        # FILTER
-        # ----------------------------------------------------
 
         show_only = st.selectbox(
             "Show",
@@ -1204,10 +1223,6 @@ style="width:{score}%">
                 st.caption(
                     f"Showing 15 of {len(filtered)} matching results."
                 )
-
-        # ----------------------------------------------------
-        # DATA
-        # ----------------------------------------------------
 
         with st.expander(
             "🌍 Environmental data used"
