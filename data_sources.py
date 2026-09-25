@@ -1,99 +1,96 @@
 """
 data_sources.py
 ---------------
-Free agricultural data sources.
+Fetch climate data from NASA POWER and soil pH data from SoilGrids.
 
-NASA POWER:
-    Temperature
-    Rainfall
-    Relative humidity
-
-SoilGrids:
-    Soil pH
-
-No API keys are required.
+Both sources are free and require no API key.
 """
+
+import json
+import sys
 
 import requests
 
 
-NASA_POWER_URL = (
-    "https://power.larc.nasa.gov/api/temporal/climatology/point"
-)
+NASA_POWER_URL = "https://power.larc.nasa.gov/api/temporal/climatology/point"
+SOILGRIDS_URL = "https://rest.isric.org/soilgrids/v2.0/properties/query"
 
-SOILGRIDS_URL = (
-    "https://rest.isric.org/soilgrids/v2.0/properties/query"
-)
+TIMEOUT = 10
 
-TIMEOUT = 15
+
+def _validate_coordinates(lat: float, lon: float):
+    """Validate latitude and longitude values."""
+
+    lat = float(lat)
+    lon = float(lon)
+
+    if not -90 <= lat <= 90:
+        raise ValueError("Latitude must be between -90 and 90.")
+
+    if not -180 <= lon <= 180:
+        raise ValueError("Longitude must be between -180 and 180.")
+
+    return lat, lon
 
 
 def _extract_annual(param_dict):
     """
-    Extract an annual value from NASA POWER.
+    Extract an annual value from a NASA POWER parameter block.
 
-    POWER responses may use different names for annual aggregates,
-    so several known formats are supported.
+    Handles the common annual keys and falls back to the average
+    of numeric values if an explicit annual key is unavailable.
     """
 
     if not isinstance(param_dict, dict):
         return None
 
-    annual_keys = (
-        "ANN",
-        "13",
-        "ANNUAL",
-        "Annual",
-        "annual",
-    )
-
-    for key in annual_keys:
+    for key in ("ANN", "13", "ANNUAL", "Annual"):
         value = param_dict.get(key)
 
         if isinstance(value, (int, float)):
             return float(value)
 
-    numeric_values = []
+    values = [
+        value
+        for value in param_dict.values()
+        if isinstance(value, (int, float))
+    ]
 
-    for value in param_dict.values():
-
-        if isinstance(value, (int, float)):
-            numeric_values.append(float(value))
-
-    if not numeric_values:
+    if not values:
         return None
 
-    return sum(numeric_values) / len(numeric_values)
+    return sum(values) / len(values)
 
 
-def fetch_climate(lat: float, lon: float):
+def fetch_climate(lat: float, lon: float) -> dict:
     """
-    Fetch long-term climate information.
+    Fetch long-term climate data for a location.
 
     Returns:
-
         temp_c
         rain_mm_year
         humidity_pct
         error
     """
 
-    result = {
+    out = {
         "temp_c": None,
         "rain_mm_year": None,
         "humidity_pct": None,
         "error": None,
     }
 
-    params = {
-        "parameters": "T2M,PRECTOTCORR,RH2M",
-        "community": "AG",
-        "longitude": lon,
-        "latitude": lat,
-        "format": "JSON",
-    }
-
     try:
+        lat, lon = _validate_coordinates(lat, lon)
+
+        params = {
+            "parameters": "T2M,PRECTOTCORR,RH2M",
+            "community": "AG",
+            "longitude": lon,
+            "latitude": lat,
+            "format": "JSON",
+        }
+
         response = requests.get(
             NASA_POWER_URL,
             params=params,
@@ -104,180 +101,190 @@ def fetch_climate(lat: float, lon: float):
 
         data = response.json()
 
-        parameter_block = (
+        param_block = (
             data
             .get("properties", {})
             .get("parameter", {})
         )
 
-        result["temp_c"] = _extract_annual(
-            parameter_block.get("T2M", {})
+        if not param_block:
+            raise ValueError(
+                "NASA POWER returned no parameter data."
+            )
+
+        # Average temperature.
+        out["temp_c"] = _extract_annual(
+            param_block.get("T2M", {})
         )
 
-        precipitation = _extract_annual(
-            parameter_block.get("PRECTOTCORR", {})
+        # NASA POWER precipitation is represented as an
+        # average daily precipitation value in the climatology.
+        rain_avg_daily = _extract_annual(
+            param_block.get("PRECTOTCORR", {})
         )
 
-        if precipitation is not None:
-            # NASA POWER precipitation climatology is treated here
-            # as average daily precipitation.
-            result["rain_mm_year"] = precipitation * 365.0
+        if rain_avg_daily is not None:
+            out["rain_mm_year"] = rain_avg_daily * 365
 
-        result["humidity_pct"] = _extract_annual(
-            parameter_block.get("RH2M", {})
+        # Relative humidity.
+        out["humidity_pct"] = _extract_annual(
+            param_block.get("RH2M", {})
         )
 
     except requests.RequestException as exc:
-
-        result["error"] = (
+        out["error"] = (
             f"NASA POWER request failed: {exc}"
         )
 
     except (ValueError, KeyError, TypeError) as exc:
-
-        result["error"] = (
-            f"NASA POWER response could not be parsed: {exc}"
+        out["error"] = (
+            f"NASA POWER data could not be read: {exc}"
         )
 
     except Exception as exc:
-
-        result["error"] = (
-            f"NASA POWER unexpected error: {exc}"
+        out["error"] = (
+            f"NASA POWER fetch failed: {exc}"
         )
 
-    return result
+    return out
 
 
-def _fetch_ph_at_depth(lat: float, lon: float, depth: str):
-    """Returns pH for one depth layer, or None if that depth has no
-    reading at this point (a real, fairly common SoilGrids gap)."""
-
-    params = {
-        "lon": lon,
-        "lat": lat,
-        "property": "phh2o",
-        "depth": depth,
-        "value": "mean",
-    }
-
-    response = requests.get(
-        SOILGRIDS_URL,
-        params=params,
-        timeout=TIMEOUT,
-    )
-
-    response.raise_for_status()
-
-    data = response.json()
-
-    layers = (
-        data
-        .get("properties", {})
-        .get("layers", [])
-    )
-
-    ph_layer = next(
-        (
-            layer
-            for layer in layers
-            if layer.get("name") == "phh2o"
-        ),
-        None,
-    )
-
-    if ph_layer is None:
-        raise ValueError(
-            "phh2o layer was not present in the response."
-        )
-
-    depths = ph_layer.get("depths", [])
-
-    if not depths:
-        raise ValueError(
-            "No soil depth data was returned."
-        )
-
-    raw_value = depths[0].get("values", {}).get("mean")
-
-    if raw_value is None:
-        return None  # this depth has no reading here -- try a deeper one
-
-    unit_measure = ph_layer.get("unit_measure", {})
-    d_factor = unit_measure.get("d_factor", 10)
-
-    return float(raw_value) / float(d_factor) if d_factor else float(raw_value)
-
-
-def fetch_soil(lat: float, lon: float):
+def fetch_soil(lat: float, lon: float) -> dict:
     """
-    Fetch soil pH from SoilGrids.
+    Fetch soil pH for the top 0-5 cm of soil.
 
-    Tries 0-5cm first, then falls back to 5-15cm and 15-30cm --
-    SoilGrids fairly often has no reading at the shallowest depth for a
-    given point (disturbed land, coastline, etc.) even when deeper
-    layers do have one. Trying only 0-5cm and giving up, as an earlier
-    version of this file did, meant soil pH -- and therefore a third
-    of the suitability score -- came back empty far more often than
-    it needed to.
+    Returns:
+        ph
+        error
     """
 
-    result = {
+    out = {
         "ph": None,
         "error": None,
     }
 
-    for depth in ("0-5cm", "5-15cm", "15-30cm"):
-        try:
-            ph = _fetch_ph_at_depth(lat, lon, depth)
-            if ph is not None:
-                result["ph"] = ph
-                return result
+    try:
+        lat, lon = _validate_coordinates(lat, lon)
 
-        except requests.RequestException as exc:
-            result["error"] = f"SoilGrids request failed: {exc}"
-            return result
+        params = {
+            "lon": lon,
+            "lat": lat,
+            "property": "phh2o",
+            "depth": "0-5cm",
+            "value": "mean",
+        }
 
-        except (ValueError, KeyError, TypeError, StopIteration) as exc:
-            result["error"] = f"SoilGrids response could not be parsed: {exc}"
-            return result
+        response = requests.get(
+            SOILGRIDS_URL,
+            params=params,
+            timeout=TIMEOUT,
+        )
 
-        except Exception as exc:
-            result["error"] = f"SoilGrids unexpected error: {exc}"
-            return result
+        response.raise_for_status()
 
-    result["error"] = "SoilGrids has no pH reading for this point at 0-30cm depth."
-    return result
+        data = response.json()
+
+        layers = (
+            data
+            .get("properties", {})
+            .get("layers", [])
+        )
+
+        ph_layer = next(
+            (
+                layer
+                for layer in layers
+                if layer.get("name") == "phh2o"
+            ),
+            None,
+        )
+
+        if ph_layer is None:
+            raise ValueError(
+                "SoilGrids did not return a phh2o layer."
+            )
+
+        depths = ph_layer.get("depths", [])
+
+        if not depths:
+            raise ValueError(
+                "SoilGrids did not return depth data."
+            )
+
+        depth_block = depths[0]
+
+        values = depth_block.get("values", {})
+
+        raw_value = values.get("mean")
+
+        if raw_value is None:
+            raise ValueError(
+                "SoilGrids did not return a mean pH value."
+            )
+
+        unit_measure = ph_layer.get(
+            "unit_measure",
+            {},
+        )
+
+        d_factor = unit_measure.get(
+            "d_factor",
+            10,
+        )
+
+        out["ph"] = (
+            float(raw_value) / float(d_factor)
+            if d_factor
+            else float(raw_value)
+        )
+
+    except requests.RequestException as exc:
+        out["error"] = (
+            f"SoilGrids request failed: {exc}"
+        )
+
+    except (ValueError, KeyError, TypeError, StopIteration) as exc:
+        out["error"] = (
+            f"SoilGrids data could not be read: {exc}"
+        )
+
+    except Exception as exc:
+        out["error"] = (
+            f"SoilGrids fetch failed: {exc}"
+        )
+
+    return out
+
+
+def fetch_all(lat: float, lon: float) -> dict:
+    """Fetch both climate and soil data."""
+
+    return {
+        "climate": fetch_climate(lat, lon),
+        "soil": fetch_soil(lat, lon),
+    }
 
 
 if __name__ == "__main__":
-
-    import json
-    import sys
-
-    latitude = (
-        float(sys.argv[1])
-        if len(sys.argv) > 1
-        else 25.2854
-    )
-
-    longitude = (
-        float(sys.argv[2])
-        if len(sys.argv) > 2
-        else 51.5310
-    )
-
-    print("\nCLIMATE")
-    print(
-        json.dumps(
-            fetch_climate(latitude, longitude),
-            indent=2,
+    if len(sys.argv) != 3:
+        print(
+            "Usage: python data_sources.py <latitude> <longitude>"
         )
-    )
+        raise SystemExit(1)
 
-    print("\nSOIL")
-    print(
-        json.dumps(
-            fetch_soil(latitude, longitude),
-            indent=2,
+    try:
+        latitude = float(sys.argv[1])
+        longitude = float(sys.argv[2])
+
+        results = fetch_all(latitude, longitude)
+
+        print(
+            json.dumps(
+                results,
+                indent=2,
+            )
         )
-    )
+
+    except ValueError as exc:
+        print(f"Error: {exc}")
+        raise SystemExit(1)
