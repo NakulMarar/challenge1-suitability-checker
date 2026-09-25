@@ -34,10 +34,10 @@ DEFAULT_LAT = 25.2854
 DEFAULT_LON = 51.5310
 
 PAGES = [
-    "Analyze Land",
-    "Crop Finder",
-    "Disease AI",
-    "About",
+    "🗺️ Analyze Land",
+    "🌾 Crop Finder",
+    "🔬 Disease AI",
+    "ℹ️ About",
 ]
 
 
@@ -91,11 +91,11 @@ def score_percent(score):
 
 def verdict_icon(verdict):
     return {
-        "Suitable": "Good",
-        "Marginal": "Moderate",
-        "Not suitable": "Poor",
-        "Unknown": "Unknown",
-    }.get(verdict, "Unknown")
+        "Suitable": "🟢",
+        "Marginal": "🟡",
+        "Not suitable": "🔴",
+        "Unknown": "⚪",
+    }.get(verdict, "⚪")
 
 
 def factor_status(score):
@@ -195,7 +195,6 @@ st.markdown(
     .metric-value {
         font-size: 1.55rem;
         font-weight: 750;
-        color: #1f2937;
     }
 
     .factor-card {
@@ -204,13 +203,11 @@ st.markdown(
         border: 1px solid #e6e6e6;
         background: #ffffff;
         margin-bottom: 0.7rem;
-        color: #1f2937;
     }
 
     .factor-title {
         font-weight: 700;
         font-size: 1rem;
-        color: #1f2937;
     }
 
     .factor-detail {
@@ -224,7 +221,6 @@ st.markdown(
         border-radius: 18px;
         background: #e8f5e9;
         border: 1px solid #a5d6a7;
-        color: #1b4332;
     }
 
     .warning-box {
@@ -232,7 +228,6 @@ st.markdown(
         border-radius: 18px;
         background: #fff8e1;
         border: 1px solid #ffe082;
-        color: #5f4200;
     }
 
     .danger-box {
@@ -240,27 +235,14 @@ st.markdown(
         border-radius: 18px;
         background: #ffebee;
         border: 1px solid #ef9a9a;
-        color: #7f1d1d;
     }
 
     .about-card {
         padding: 1.2rem;
         border-radius: 18px;
-        border: 1px solid #222222;
-        background: #000000;
-        color: #ffffff;
+        border: 1px solid #e5e5e5;
+        background: white;
         margin-bottom: 1rem;
-    }
-
-    .about-card h3,
-    .about-card p,
-    .about-card li,
-    .about-card strong {
-        color: #ffffff !important;
-    }
-
-    .about-card h3 {
-        margin-top: 0;
     }
 
     footer {
@@ -286,15 +268,8 @@ with st.sidebar:
             padding:0.5rem 0 1rem 0;
         ">
             <div style="font-size:3rem;">🌱</div>
-
-            <h2 style="margin:0;">
-                CropWise
-            </h2>
-
-            <p style="
-                color:#777;
-                margin-top:0.2rem;
-            ">
+            <h2 style="margin:0;">CropWise</h2>
+            <p style="color:#777;margin-top:0.2rem;">
                 Smart land & crop suitability
             </p>
         </div>
@@ -303,7 +278,6 @@ with st.sidebar:
     )
 
     st.divider()
-
     st.markdown("### Navigation")
 
     for sidebar_page in PAGES:
@@ -369,7 +343,7 @@ if page != st.session_state.page:
 # ANALYZE LAND
 # ============================================================
 
-if st.session_state.page == "Analyze Land":
+if st.session_state.page == "🗺️ Analyze Land":
 
     st.subheader("Analyze a location")
 
@@ -382,7 +356,7 @@ if st.session_state.page == "Analyze Land":
 
     with col1:
 
-        st.markdown("#### Select a location")
+        st.markdown("#### 📍 Select a location")
 
         m = folium.Map(
             location=[
@@ -534,7 +508,7 @@ if st.session_state.page == "Analyze Land":
         )
 
         reset = st.button(
-            "Reset location",
+            "↩️ Reset location",
             use_container_width=True,
         )
 
@@ -559,7 +533,7 @@ if st.session_state.page == "Analyze Land":
 
     st.divider()
 
-    st.subheader("Choose a crop")
+    st.subheader("🌾 Choose a crop")
 
     crop_names = sorted(
         CROP_THRESHOLDS.keys()
@@ -583,7 +557,7 @@ if st.session_state.page == "Analyze Land":
     if selected_crop == "Select a crop...":
 
         st.info(
-            "Select a crop to view its preferred conditions "
+            "🌱 Select a crop to view its preferred conditions "
             "and analyze this location."
         )
 
@@ -641,7 +615,7 @@ if st.session_state.page == "Analyze Land":
         # ----------------------------------------------------
 
         if st.button(
-            "Check this location",
+            "🔎 Check this location",
             type="primary",
             use_container_width=True,
         ):
@@ -713,7 +687,7 @@ if st.session_state.page == "Analyze Land":
             f"""
             <div class="{box_class}">
                 <h2 style="margin:0;">
-                    {verdict}
+                    {verdict_icon(verdict)} {verdict}
                 </h2>
 
                 <p style="
@@ -749,7 +723,7 @@ if st.session_state.page == "Analyze Land":
                 <div class="metric-card">
 
                     <div class="metric-title">
-                        Average Temperature
+                        🌡️ Average Temperature
                     </div>
 
                     <div class="metric-value">
@@ -776,7 +750,7 @@ if st.session_state.page == "Analyze Land":
                 <div class="metric-card">
 
                     <div class="metric-title">
-                        Annual Rainfall
+                        🌧️ Annual Rainfall
                     </div>
 
                     <div class="metric-value">
@@ -803,7 +777,7 @@ if st.session_state.page == "Analyze Land":
                 <div class="metric-card">
 
                     <div class="metric-title">
-                        Soil pH
+                        🧪 Soil pH
                     </div>
 
                     <div class="metric-value">
@@ -822,7 +796,7 @@ if st.session_state.page == "Analyze Land":
         st.markdown("")
 
         st.subheader(
-            "Factor breakdown"
+            "📊 Factor breakdown"
         )
 
         for factor_name, factor in analysis[
@@ -858,9 +832,7 @@ if st.session_state.page == "Analyze Land":
                                 {score_percent(score_value)}%
                             </strong>
 
-                            &nbsp;•&nbsp;
-
-                            {status}
+                            &nbsp;•&nbsp; {status}
                         </div>
 
                     </div>
@@ -890,7 +862,7 @@ if st.session_state.page == "Analyze Land":
             )
 
         st.subheader(
-            "Why this result?"
+            "💡 Why this result?"
         )
 
         for reason in analysis["reasons"]:
@@ -914,10 +886,10 @@ if st.session_state.page == "Analyze Land":
 # CROP FINDER
 # ============================================================
 
-elif st.session_state.page == "Crop Finder":
+elif st.session_state.page == "🌾 Crop Finder":
 
     st.subheader(
-        "Crop Finder"
+        "🌾 Crop Finder"
     )
 
     st.write(
@@ -956,7 +928,7 @@ elif st.session_state.page == "Crop Finder":
         )
 
     if st.button(
-        "Find suitable crops",
+        "🌱 Find suitable crops",
         type="primary",
         use_container_width=True,
     ):
@@ -1024,7 +996,7 @@ elif st.session_state.page == "Crop Finder":
             st.divider()
 
             st.subheader(
-                "Matching crops"
+                "🌿 Matching crops"
             )
 
             for result in results[:12]:
@@ -1052,9 +1024,15 @@ elif st.session_state.page == "Crop Finder":
                                 </strong>
 
                                 <div class="factor-detail">
+
+                                    {verdict_icon(
+                                        result["verdict"]
+                                    )}
+
                                     {safe_text(
                                         result["verdict"]
                                     )}
+
                                 </div>
 
                             </div>
@@ -1079,10 +1057,10 @@ elif st.session_state.page == "Crop Finder":
 # DISEASE AI
 # ============================================================
 
-elif st.session_state.page == "Disease AI":
+elif st.session_state.page == "🔬 Disease AI":
 
     st.subheader(
-        "Plant Disease AI"
+        "🔬 Plant Disease AI"
     )
 
     st.write(
@@ -1113,7 +1091,7 @@ elif st.session_state.page == "Disease AI":
         )
 
         if st.button(
-            "Analyze leaf",
+            "🔬 Analyze leaf",
             type="primary",
             use_container_width=True,
         ):
@@ -1161,14 +1139,14 @@ elif st.session_state.page == "Disease AI":
         if disease == "Healthy":
 
             st.success(
-                f"The AI predicts that the "
+                f"🌿 The AI predicts that the "
                 f"{plant} leaf looks healthy."
             )
 
         else:
 
             st.warning(
-                f"Possible condition: {disease}"
+                f"⚠️ Possible condition: **{disease}**"
             )
 
         st.metric(
@@ -1182,7 +1160,7 @@ elif st.session_state.page == "Disease AI":
         )
 
         st.info(
-            f"Suggested action: {treatment}"
+            f"💡 **Suggested action:** {treatment}"
         )
 
         if len(disease_results) > 1:
@@ -1204,19 +1182,17 @@ elif st.session_state.page == "Disease AI":
 # ABOUT
 # ============================================================
 
-elif st.session_state.page == "About":
+elif st.session_state.page == "ℹ️ About":
 
     st.subheader(
-        "About CropWise"
+        "ℹ️ About CropWise"
     )
 
     st.markdown(
         """
         <div class="about-card">
 
-            <h3>
-                What is CropWise?
-            </h3>
+            <h3>🌱 What is CropWise?</h3>
 
             <p>
                 CropWise is a land and crop suitability tool built
@@ -1238,9 +1214,7 @@ elif st.session_state.page == "About":
         """
         <div class="about-card">
 
-            <h3>
-                Data sources
-            </h3>
+            <h3>🌍 Data sources</h3>
 
             <ul>
                 <li>
@@ -1273,9 +1247,7 @@ elif st.session_state.page == "About":
         """
         <div class="about-card">
 
-            <h3>
-                How suitability is calculated
-            </h3>
+            <h3>🧠 How suitability is calculated</h3>
 
             <p>
                 CropWise compares:
@@ -1311,5 +1283,5 @@ elif st.session_state.page == "About":
 st.divider()
 
 st.caption(
-    "CropWise • Reboot the Earth 2026 • Challenge 1 • Team 17"
+    "🌱 CropWise • Reboot the Earth 2026 • Challenge 1 • Team 17"
 )
